@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.VClassMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.VClass">
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="className" jdbcType="VARCHAR" property="classname"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="num" jdbcType="BIGINT" property="num"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+        <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+        <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+        <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+        <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+        <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+        <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+        <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    cid, ccid, className, mid, num, grade, companyName, majorName, jseid, jsname,dseid, dsname, bzreid,  bzrname, stage
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!=''">
+                and (cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="bzreid!=null and bzreid!='' ">
+                and ( bzreid = #{bzreid,jdbcType=BIGINT})
+            </if>
+            <if test="bzreid!=null and bzreid!='' ">
+                and (bzreid = #{bzreid,jdbcType=BIGINT})
+            </if>
+            <if test="teacheid!=null and teacheid!='' ">
+                and ((jseid = #{teacheid,jdbcType=BIGINT}) or (dseid = #{teacheid,jdbcType=BIGINT}))
+            </if>
+            <if test="nozero!= null and nozero!=''">
+                and (num!=0)
+            </if>
+            <if test="stage!= null and stage!=''">
+                and( stage = #{stage,jdbcType=VARCHAR})
+            </if>
+            <if test="state!=null and state!=''">
+                and state != #{state,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from v_class
+        <include refid="where_all"/>
+        order by ccid asc , grade desc , mid asc
+        <include refid="limit_sql"/>
+    </select>
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*) from v_class
+        <include refid="where_all"/>
+    </select>
+
+    <resultMap id="BaseResultMapBo" type="com.hp.vclass.bo.VClassBo" extends="BaseResultMap">
+        <result property="totalsum" column="totalsum" jdbcType="BIGINT"></result>
+        <result property="totalclass" column="totalclass" jdbcType="BIGINT"></result>
+    </resultMap>
+
+    <select id="findClassBoByParam" resultMap="BaseResultMapBo">
+        SELECT SUM(num) AS totalsum,
+        SUM(CASE WHEN num>0 THEN 1 ELSE 0 END) AS totalclass
+        FROM v_class
+        WHERE  mid=#{mid,jdbcType=BIGINT}
+        AND cid=#{cid,jdbcType=BIGINT}
+        AND stage = #{stage,jdbcType=VARCHAR}
+        AND grade = #{grade,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="SelectVClassByccid" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM v_class WHERE ccid = #{ccid};
+    </select>
+
+    <select id="findVClassByClassName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from v_class
+        where className = #{className,jdbcType=VARCHAR}
+    </select>
+
+    <select id="findVClassByCcid" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from v_class
+        where ccid = #{ccid,jdbcType=BIGINT}
+    </select>
+
+
+    <select id="findClassByParam" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from v_class
+        <where>
+            AND num != 0
+            <!-- 根据校区 -->
+            <if test="cid!=null and cid!=''">
+                and cid = #{cid,jdbcType=BIGINT}
+            </if>
+            <!-- 根据年级 -->
+            <if test="grade!=null and grade!=''">
+                and grade = #{grade,jdbcType=VARCHAR}
+            </if>
+            <!-- 根据专业 -->
+            <if test="mid!=null and mid!=''">
+                and mid = #{mid,jdbcType=BIGINT}
+            </if>
+            <!-- 根据班级 id-->
+            <if test="ccid!=null and ccid!=''">
+                and ccid = #{ccid,jdbcType=BIGINT}
+            </if>
+            <!-- 根据状态 state-->
+            <if test="state!=null and state!=''">
+                and state != #{state,jdbcType=VARCHAR}
+            </if>
+
+            <!--未登记出勤-->
+            <if test="attendRecordTime!=null and attendRecordTime!=''">
+                and ccid not in(
+                SELECT ccid
+                FROM u_class_attendance
+                WHERE record_time =#{attendRecordTime,jdbcType=BIGINT}
+                )
+            </if>
+            -- 讲师
+            <if test="eid!=null and eid!='' ">
+                and (
+                (jseid = #{eid,jdbcType=BIGINT}) or (dseid = #{eid,jdbcType=BIGINT})
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="findClassGradeByParam" parameterType="java.util.Map" resultType="java.lang.String">
+        select grade
+        from v_class
+        where cid = #{cid,,jdbcType=BIGINT}
+        GROUP  by grade
+    </select>
+</mapper>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UReviewCompanyMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UReviewCompany">
+        <id column="urcid" jdbcType="BIGINT" property="urcid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="eid" jdbcType="BIGINT" property="eid"/>
+        <result column="review_time" jdbcType="DATE" property="reviewTime"/>
+        <result column="qualified" jdbcType="DECIMAL" property="qualified"/>
+        <result column="score1" jdbcType="BIGINT" property="score1"/>
+        <result column="score2" jdbcType="BIGINT" property="score2"/>
+        <result column="score3" jdbcType="BIGINT" property="score3"/>
+        <result column="headflg" jdbcType="BIGINT" property="headflg"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapView" type="com.hp.common.model.VReviewCompany">
+        <result column="summary_time" jdbcType="VARCHAR" property="summaryTime" />
+        <result column="eid" jdbcType="BIGINT" property="eid" />
+        <result column="score1" jdbcType="BIGINT" property="score1" />
+        <result column="score2" jdbcType="BIGINT" property="score2" />
+        <result column="score3" jdbcType="BIGINT" property="score3" />
+        <result column="review_company" jdbcType="DECIMAL" property="reviewCompany" />
+        <result column="headflg" jdbcType="BIGINT" property="headflg" />
+    </resultMap>
+
+
+
+    <resultMap id="BaseResultMapAndEmployee" type="com.hp.common.model.VReviewCompany" extends="BaseResultMapView">
+        <association property="uEmployee" javaType="com.hp.common.model.UEmployee">
+            <id column="eid" jdbcType="BIGINT" property="eid"/>
+            <result column="employee_name" jdbcType="VARCHAR" property="name"/>
+        </association>
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <result column="company_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    urcid, cid, eid, review_time, qualified, score1 ,score2, score3, headflg
+    </sql>
+
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(c3.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(c2.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                c2.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                c1.summary_time = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndEmployee">
+        SELECT c1.*,  c2.eid,c2.name as employee_name, c3.name as company_name
+        FROM v_review_company c1
+        LEFT JOIN u_employee c2
+        ON c1.eid = c2.eid
+        LEFT JOIN u_company c3
+        ON c2.cid = c3.cid
+        <include refid="where_all"/>
+        ORDER BY c1.summary_time DESC ,c2.cid,c2.eid
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMapView">
+        select count(*)
+        from v_review_company c1
+        LEFT JOIN u_employee c2
+        ON c1.eid = c2.eid
+        LEFT JOIN u_company c3
+        ON c2.cid = c3.cid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="com.hp.common.model.UReviewCompany" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_review_company
+        WHERE DATE_FORMAT(review_time,'%Y-%m') = DATE_FORMAT(#{reviewTime,jdbcType=DATE},'%Y-%m')
+        AND eid = #{eid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_review_company
+    where urcid = #{urcid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UReviewCompany">
+    insert into u_review_company (urcid, cid, eid, 
+      review_time, qualified, score1, score2, score3,headflg)
+    values (#{urcid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{eid,jdbcType=BIGINT}, 
+      #{reviewTime,jdbcType=DATE}, #{score1,jdbcType=BIGINT}, #{score2,jdbcType=BIGINT}, #{score3,jdbcType=BIGINT},#{headflg,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UReviewCompany">
+        insert into u_review_company
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="urcid != null">
+                urcid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="eid != null">
+                eid,
+            </if>
+            <if test="reviewTime != null">
+                review_time,
+            </if>
+            <if test="qualified != null">
+                qualified,
+            </if>
+            <if test="score1 != null">
+                score1,
+            </if>
+            <if test="score2 != null">
+                score2,
+            </if>
+            <if test="score3 != null">
+                score3,
+            </if>
+            <if test="headflg != null">
+                headflg,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="urcid != null">
+                #{urcid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewTime != null">
+                #{reviewTime,jdbcType=DATE},
+            </if>
+            <if test="qualified != null">
+                #{qualified,jdbcType=DECIMAL},
+            </if>
+            <if test="score1 != null">
+                #{score1,jdbcType=BIGINT},
+            </if>
+            <if test="score2 != null">
+                #{score2,jdbcType=BIGINT},
+            </if>
+            <if test="score3 != null">
+                #{score3,jdbcType=BIGINT},
+            </if>
+            <if test="headflg != null">
+                #{headflg,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UReviewCompany">
+        update u_review_company
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                eid = #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewTime != null">
+                review_time = #{reviewTime,jdbcType=DATE},
+            </if>
+            <if test="qualified != null">
+                qualified = #{qualified,jdbcType=DECIMAL},
+            </if>
+            <if test="score1 != null">
+                score1 = #{score1,jdbcType=BIGINT},
+            </if>
+            <if test="score2 != null">
+                score2 = #{score2,jdbcType=BIGINT},
+            </if>
+            <if test="score3 != null">
+                score3 = #{score3,jdbcType=BIGINT},
+            </if>
+            <if test="headflg != null">
+                headflg = #{headflg,jdbcType=BIGINT},
+            </if>
+        </set>
+        where urcid = #{urcid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UReviewCompany">
+    update u_review_company
+    set cid = #{cid,jdbcType=BIGINT},
+      eid = #{eid,jdbcType=BIGINT},
+      review_time = #{reviewTime,jdbcType=DATE},
+      qualified = #{qualified,jdbcType=DECIMAL},
+      score1 = #{qualified,jdbcType=BIGINT},
+      score2 = #{qualified,jdbcType=BIGINT},
+      score3 = #{qualified,jdbcType=BIGINT},
+      headflg = #{headflg,jdbcType=BIGINT}
+    where urcid = #{urcid,jdbcType=BIGINT}
+  </update>
+</mapper>

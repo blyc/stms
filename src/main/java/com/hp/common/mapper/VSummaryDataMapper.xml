@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.VSummaryDataMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.VSummaryData">
+        <result column="summary_date" jdbcType="VARCHAR" property="summaryDate"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="className" jdbcType="VARCHAR" property="classname"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="num" jdbcType="BIGINT" property="num"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+        <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+        <result column="majorType" jdbcType="VARCHAR" property="majortype"/>
+        <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+        <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+        <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+        <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+        <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+        <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        <result column="summary_attendance" jdbcType="DECIMAL" property="summaryAttendance"/>
+        <result column="summary_exam" jdbcType="DECIMAL" property="summaryExam"/>
+        <result column="summary_project" jdbcType="DECIMAL" property="summaryProject"/>
+        <result column="summary_satisfaction" jdbcType="DECIMAL" property="summarySatisfaction"/>
+        <result column="review_project" jdbcType="DECIMAL" property="reviewProject"/>
+        <result column="review_project_rate" jdbcType="DECIMAL" property="reviewProjectRate"/>
+        <result column="review_exam" jdbcType="DECIMAL" property="reviewExam"/>
+        <result column="review_exam_rate" jdbcType="DECIMAL" property="reviewExamRate"/>
+        <result column="review_company" jdbcType="DECIMAL" property="reviewCompany"/>
+        <result column="review_company_flg" jdbcType="DECIMAL" property="reviewCompanyFlg"/>
+        <result column="review_head" jdbcType="DECIMAL" property="reviewHead"/>
+        <result column="review_head_flg" jdbcType="DECIMAL" property="reviewHeadFlg"/>
+        <result column="record_Time" jdbcType="VARCHAR" property="recordTime"/>
+        <result column="campusName" jdbcType="VARCHAR" property="campusName"/>
+        <result column="majorName" jdbcType="VARCHAR" property="majorName"/>
+        <result column="className" jdbcType="VARCHAR" property="className"/>
+        <result column="studentName" jdbcType="VARCHAR" property="studentName"/>
+        <result column="attendanceRate" jdbcType="DOUBLE" property="attendanceRate"/>
+        <result column="belateCount" jdbcType="INTEGER" property="belateCount"/>
+        <result column="truantCount" jdbcType="INTEGER" property="truantCount"/>
+        <result column="leaveCount" jdbcType="INTEGER" property="leaveCount"/>
+        <result column="leaveearlyCount" jdbcType="INTEGER" property="leaveearlyCount"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        summary_date, cid, ccid, className, mid, num,grade, companyName, majorName,majorType,jseid, jsname, dseid,
+      dsname, bzreid, bzrname,stage, summary_attendance, summary_exam,summary_project, summary_satisfaction,review_project,
+      review_project_rate,review_exam,review_exam_rate,review_company,review_company_flg,review_head,review_head_flg
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(majorName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                summary_date = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="student_from">
+        ( SELECT record_time,sid,
+        SUM(CASE record1 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record2 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record3 WHEN 1
+        THEN 1 ELSE 0 END)+SUM(CASE record4 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record5 WHEN 1 THEN 1 ELSE 0
+        END)+SUM(CASE record6 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record7 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record8 WHEN
+        1 THEN 1 ELSE 0 END)+SUM(CASE record9 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record10 WHEN 1 THEN 1 ELSE 0
+        END)+SUM(CASE record11 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record12 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record13
+        WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record14 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record15 WHEN 1 THEN 1 ELSE 0
+        END)+SUM(CASE record16 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record17 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record18
+        WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record19 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record20 WHEN 1 THEN 1 ELSE 0
+        END)+SUM(CASE record21 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record22 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record23
+        WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record24 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record25 WHEN 1 THEN 1 ELSE 0
+        END)+SUM(CASE record26 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record27 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record28
+        WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record29 WHEN 1 THEN 1 ELSE 0 END)+SUM(CASE record30 WHEN 1 THEN 1 ELSE 0
+        END) + SUM(CASE record31 WHEN 1 THEN 1 ELSE 0 END)
+        AS attendanceCount,
+        SUM(CASE record1 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record2 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record3 WHEN 2
+        THEN 1 ELSE 0 END)+SUM(CASE record4 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record5 WHEN 2 THEN 1 ELSE 0
+        END)+SUM(CASE record6 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record7 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record8 WHEN
+        2 THEN 1 ELSE 0 END)+SUM(CASE record9 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record10 WHEN 2 THEN 1 ELSE 0
+        END)+SUM(CASE record11 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record12 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record13
+        WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record14 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record15 WHEN 2 THEN 1 ELSE 0
+        END)+SUM(CASE record16 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record17 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record18
+        WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record19 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record20 WHEN 2 THEN 1 ELSE 0
+        END)+SUM(CASE record21 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record22 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record23
+        WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record24 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record25 WHEN 2 THEN 1 ELSE 0
+        END)+SUM(CASE record26 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record27 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record28
+        WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record29 WHEN 2 THEN 1 ELSE 0 END)+SUM(CASE record30 WHEN 2 THEN 1 ELSE 0
+        END) + SUM(CASE record31 WHEN 2 THEN 1 ELSE 0 END)
+        AS belateCount,
+        SUM(CASE record1 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record2 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record3 WHEN 3
+        THEN 1 ELSE 0 END)+SUM(CASE record4 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record5 WHEN 3 THEN 1 ELSE 0
+        END)+SUM(CASE record6 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record7 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record8 WHEN
+        3 THEN 1 ELSE 0 END)+SUM(CASE record9 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record10 WHEN 3 THEN 1 ELSE 0
+        END)+SUM(CASE record11 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record12 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record13
+        WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record14 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record15 WHEN 3 THEN 1 ELSE 0
+        END)+SUM(CASE record16 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record17 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record18
+        WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record19 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record20 WHEN 3 THEN 1 ELSE 0
+        END)+SUM(CASE record21 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record22 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record23
+        WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record24 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record25 WHEN 3 THEN 1 ELSE 0
+        END)+SUM(CASE record26 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record27 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record28
+        WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record29 WHEN 3 THEN 1 ELSE 0 END)+SUM(CASE record30 WHEN 3 THEN 1 ELSE 0
+        END) + SUM(CASE record31 WHEN 3 THEN 1 ELSE 0 END)
+        AS truantCount,
+        SUM(CASE record1 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record2 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record3 WHEN 4
+        THEN 1 ELSE 0 END)+SUM(CASE record4 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record5 WHEN 4 THEN 1 ELSE 0
+        END)+SUM(CASE record6 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record7 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record8 WHEN
+        4 THEN 1 ELSE 0 END)+SUM(CASE record9 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record10 WHEN 4 THEN 1 ELSE 0
+        END)+SUM(CASE record11 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record12 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record13
+        WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record14 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record15 WHEN 4 THEN 1 ELSE 0
+        END)+SUM(CASE record16 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record17 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record18
+        WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record19 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record20 WHEN 4 THEN 1 ELSE 0
+        END)+SUM(CASE record21 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record22 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record23
+        WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record24 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record25 WHEN 4 THEN 1 ELSE 0
+        END)+SUM(CASE record26 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record27 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record28
+        WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record29 WHEN 4 THEN 1 ELSE 0 END)+SUM(CASE record30 WHEN 4 THEN 1 ELSE 0
+        END) + SUM(CASE record31 WHEN 4 THEN 1 ELSE 0 END)
+        AS leaveCount,
+        SUM(CASE record1 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record2 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record3 WHEN 5
+        THEN 1 ELSE 0 END)+SUM(CASE record4 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record5 WHEN 5 THEN 1 ELSE 0
+        END)+SUM(CASE record6 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record7 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record8 WHEN
+        5 THEN 1 ELSE 0 END)+SUM(CASE record9 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record10 WHEN 5 THEN 1 ELSE 0
+        END)+SUM(CASE record11 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record12 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record13
+        WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record14 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record15 WHEN 5 THEN 1 ELSE 0
+        END)+SUM(CASE record16 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record17 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record18
+        WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record19 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record20 WHEN 5 THEN 1 ELSE 0
+        END)+SUM(CASE record21 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record22 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record23
+        WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record24 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record25 WHEN 5 THEN 1 ELSE 0
+        END)+SUM(CASE record26 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record27 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record28
+        WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record29 WHEN 5 THEN 1 ELSE 0 END)+SUM(CASE record30 WHEN 5 THEN 1 ELSE 0
+        END) + SUM(CASE record31 WHEN 5 THEN 1 ELSE 0 END)
+        AS leaveearlyCount
+        FROM u_attendance
+        <where>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                record_Time = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+        GROUP BY sid,record_time
+        ) va,
+        ( SELECT us1.sid,us1.grade,us1.name,vc.majorName,vc.className,vc.companyName,vc.ccid,vc.mid
+        FROM u_student us1
+        LEFT JOIN v_class vc
+        ON us1.cid = vc.ccid
+        <where>
+            us1.state != '删除'
+            <if test="cid != null and cid !='' ">
+                and (
+                us1.u_c_cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+        ) us
+        <where>
+        us.sid = va.sid
+        <if test="findContent != null and findContent !='' ">
+            and (
+            LOWER(us.grade) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.majorName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+            )
+        </if>
+        </where>
+        ORDER BY va.record_time,us.grade,us.mid,us.ccid
+    </sql>
+
+
+
+    <sql id="student_from_count">
+        ( SELECT record_time,sid
+        FROM u_attendance
+        <where>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                record_Time = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+        GROUP BY sid,record_time
+        ) va,
+        ( SELECT us1.sid,us1.grade,us1.name,vc.majorName,vc.className,vc.companyName,vc.ccid,vc.mid
+        FROM u_student us1
+        LEFT JOIN v_class vc
+        ON us1.cid = vc.ccid
+        <where>
+            us1.state != '删除'
+            <if test="cid != null and cid !='' ">
+                and (
+                us1.u_c_cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+        ) us
+        <where>
+        us.sid = va.sid
+        <if test="findContent != null and findContent !='' ">
+            and (
+            LOWER(us.grade) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.majorName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+            LOWER(us.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+            )
+        </if>
+        </where>
+        ORDER BY va.record_time,us.grade,us.mid,us.ccid
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from v_summary_data
+        <include refid="where_all"/>
+        order by summary_date DESC ,cid, jseid, ccid
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        from v_summary_data
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="findTeacherAll" resultMap="BaseResultMap">
+        select summary_date, cid,companyName,jseid, jsname,majorType
+        ,AVG(summary_attendance) summary_attendance,
+        AVG(summary_exam) summary_exam,
+        AVG(summary_project) summary_project,
+        AVG(summary_satisfaction) summary_satisfaction,
+        AVG(review_project) review_project,
+        AVG(review_project_rate) review_project_rate,
+        AVG(review_exam) review_exam,
+        AVG(review_exam_rate) review_exam_rate,
+        AVG(review_company) review_company,
+        AVG(review_company_flg) review_company_flg,
+        AVG(review_head) review_head,
+        AVG(review_head_flg) review_head_flg
+        from v_summary_data
+        <include refid="where_all"/>
+        GROUP BY summary_date,cid,companyName,jseid,jsname,majorType
+        order by summary_date DESC,cid, majorType,jseid
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findTeacherCount" resultMap="BaseResultMap">
+        select count(*)
+        from (
+        select count(*)
+        from v_summary_data
+        <include refid="where_all"/>
+        GROUP BY summary_date,cid,companyName,jseid,jsname
+        )a
+    </select>
+
+    <select id="findMajorAll" resultMap="BaseResultMap">
+        select summary_date, cid, companyName, mid, majorName,
+        AVG(summary_attendance) summary_attendance,
+        AVG(summary_exam) summary_exam,
+        AVG(summary_project) summary_project,
+        AVG(summary_satisfaction) summary_satisfaction,
+        AVG(review_project) review_project,
+        AVG(review_exam) review_exam
+        from v_summary_data
+        <include refid="where_all"/>
+        GROUP BY summary_date,cid,companyName,mid,majorName
+        order by summary_date DESC,cid, mid
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findMajorCount" resultMap="BaseResultMap">
+        select count(*)
+        from (
+        select count(*)
+        from v_summary_data
+        <include refid="where_all"/>
+        GROUP BY summary_date,cid,companyName,mid,majorName
+        )a
+    </select>
+
+    <select id="findStudentAll" resultMap="BaseResultMap">
+        select
+        va.record_time,us.companyName AS campusName,us.grade,us.majorName,us.className,us.name as studentName,
+        ROUND(va.attendanceCount/(va.attendanceCount+va.belateCount+va.truantCount+va.leaveCount+va.leaveearlyCount),2)
+        as attendanceRate,
+        va.belateCount,va.truantCount,va.leaveCount,va.leaveearlyCount
+        from
+        <include refid="student_from"/>
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findStudentCount" resultMap="BaseResultMap">
+        SELECT
+        COUNT(*)
+        FROM
+        <include refid="student_from_count"/>
+    </select>
+
+
+</mapper>

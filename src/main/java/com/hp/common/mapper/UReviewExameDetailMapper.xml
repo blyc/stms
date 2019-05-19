@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UReviewExameDetailMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UReviewExameDetail">
+        <id column="redid" jdbcType="BIGINT" property="redid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="review_grade" jdbcType="DECIMAL" property="reviewGrade"/>
+        <result column="review_ok" jdbcType="BIT" property="reviewOk"/>
+        <result column="remake" jdbcType="VARCHAR" property="remake"/>
+        <result column="useid" jdbcType="BIGINT" property="useid"/>
+        <result column="reid" jdbcType="BIGINT" property="reid"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapExam" type="com.hp.common.model.UReviewExameDetail" extends="BaseResultMap">
+        <association property="uStudent" javaType="com.hp.common.model.UStudent">
+            <result column="name" jdbcType="VARCHAR" property="name"></result>
+        </association>
+        <association property="uStudentExam" javaType="com.hp.common.model.UStudentExam">
+            <result column="examgrade" jdbcType="DOUBLE" property="examgrade"></result>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    redid, cid, ccid, sid, review_grade, review_ok, remake, useid, reid
+  </sql>
+
+    <select id="selectByReid" parameterType="java.lang.Long" resultMap="BaseResultMapExam">
+        SELECT urd.*,us1.name,us2.examgrade
+        FROM u_review_exame_detail urd
+        LEFT JOIN  u_student us1
+        ON urd.sid = us1.sid
+        LEFT JOIN u_student_exam us2
+        ON urd.useid =us2.useid
+        where urd.reid = #{reid,jdbcType=BIGINT}
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_review_exame_detail
+        where redid = #{redid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_review_exame_detail
+    where redid = #{redid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UReviewExameDetail">
+    insert into u_review_exame_detail (redid, cid, ccid, 
+      sid, review_grade, review_ok, remake
+      useid, reid)
+    values (#{redid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, 
+      #{sid,jdbcType=BIGINT}, #{reviewGrade,jdbcType=DECIMAL}, #{reviewOk,jdbcType=BIT},
+      #{remake,jdbcType=VARCHAR}, #{useid,jdbcType=BIGINT}, #{reid,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UReviewExameDetail">
+        insert into u_review_exame_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="redid != null">
+                redid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="reviewGrade != null">
+                review_grade,
+            </if>
+            <if test="reviewOk != null">
+                review_ok,
+            </if>
+            <if test="remake != null">
+                remake,
+            </if>
+            <if test="useid != null">
+                useid,
+            </if>
+            <if test="reid != null">
+                reid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="redid != null">
+                #{redid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewGrade != null">
+                #{reviewGrade,jdbcType=DECIMAL},
+            </if>
+            <if test="reviewOk != null">
+                #{reviewOk,jdbcType=BIT},
+            </if>
+            <if test="remake != null">
+                #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="useid != null">
+                #{useid,jdbcType=BIGINT},
+            </if>
+            <if test="reid != null">
+                #{reid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UReviewExameDetail">
+        update u_review_exame_detail
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                sid = #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewGrade != null">
+                review_grade = #{reviewGrade,jdbcType=DECIMAL},
+            </if>
+            <if test="remake != null">
+                remake = #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="reviewOk != null">
+                review_ok = #{reviewOk,jdbcType=BIT},
+            </if>
+            <if test="useid != null">
+                useid = #{useid,jdbcType=BIGINT},
+            </if>
+            <if test="reid != null">
+                reid = #{reid,jdbcType=BIGINT},
+            </if>
+        </set>
+        where redid = #{redid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UReviewExameDetail">
+    update u_review_exame_detail
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      sid = #{sid,jdbcType=BIGINT},
+      review_grade = #{reviewGrade,jdbcType=DECIMAL},
+      review_ok = #{reviewOk,jdbcType=BIT},
+      remake= #{remake,jdbcType=VARCHAR},
+      useid = #{useid,jdbcType=BIGINT},
+      reid = #{reid,jdbcType=BIGINT}
+    where redid = #{redid,jdbcType=BIGINT}
+  </update>
+</mapper>

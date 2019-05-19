@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.VSummaryExamMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.VSummaryExam">
+        <result column="summary_time" jdbcType="VARCHAR" property="summaryTime"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="summary_exam" jdbcType="DECIMAL" property="summaryExam"/>
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+        </association>
+    </resultMap>
+
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(vc.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(vc.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(vc.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(vc.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(vc.majorName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                vc.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT vse.*,vc.*
+        FROM v_summary_exam vse
+        LEFT JOIN v_class vc
+        ON vc.ccid = vse.ccid
+        <include refid="where_all"/>
+        ORDER BY vse.summary_time DESC ,vc.className
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        FROM v_summary_exam vse
+        LEFT JOIN v_class vc
+        ON vc.ccid = vse.ccid
+        <include refid="where_all"/>
+    </select>
+
+
+</mapper>

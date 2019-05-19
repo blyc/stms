@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UAttendanceMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UAttendance">
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="record_time" jdbcType="VARCHAR" property="recordTime"/>
+        <result column="record1" jdbcType="BIGINT" property="record1"/>
+        <result column="record2" jdbcType="BIGINT" property="record2"/>
+        <result column="record3" jdbcType="BIGINT" property="record3"/>
+        <result column="record4" jdbcType="BIGINT" property="record4"/>
+        <result column="record5" jdbcType="BIGINT" property="record5"/>
+        <result column="record6" jdbcType="BIGINT" property="record6"/>
+        <result column="record7" jdbcType="BIGINT" property="record7"/>
+        <result column="record8" jdbcType="BIGINT" property="record8"/>
+        <result column="record9" jdbcType="BIGINT" property="record9"/>
+        <result column="record10" jdbcType="BIGINT" property="record10"/>
+        <result column="record11" jdbcType="BIGINT" property="record11"/>
+        <result column="record12" jdbcType="BIGINT" property="record12"/>
+        <result column="record13" jdbcType="BIGINT" property="record13"/>
+        <result column="record14" jdbcType="BIGINT" property="record14"/>
+        <result column="record15" jdbcType="BIGINT" property="record15"/>
+        <result column="record16" jdbcType="BIGINT" property="record16"/>
+        <result column="record17" jdbcType="BIGINT" property="record17"/>
+        <result column="record18" jdbcType="BIGINT" property="record18"/>
+        <result column="record19" jdbcType="BIGINT" property="record19"/>
+        <result column="record20" jdbcType="BIGINT" property="record20"/>
+        <result column="record21" jdbcType="BIGINT" property="record21"/>
+        <result column="record22" jdbcType="BIGINT" property="record22"/>
+        <result column="record23" jdbcType="BIGINT" property="record23"/>
+        <result column="record24" jdbcType="BIGINT" property="record24"/>
+        <result column="record25" jdbcType="BIGINT" property="record25"/>
+        <result column="record26" jdbcType="BIGINT" property="record26"/>
+        <result column="record27" jdbcType="BIGINT" property="record27"/>
+        <result column="record28" jdbcType="BIGINT" property="record28"/>
+        <result column="record29" jdbcType="BIGINT" property="record29"/>
+        <result column="record30" jdbcType="BIGINT" property="record30"/>
+        <result column="record31" jdbcType="BIGINT" property="record31"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_id" jdbcType="BIGINT" property="updateId"/>
+    </resultMap>
+
+    <resultMap id="DetailResultMap" type="com.hp.attendance.bo.Attendancebo">
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="record" jdbcType="BIGINT" property="record"/>
+    </resultMap>
+
+    <resultMap id="RemarksDetailResultMap" type="com.hp.attendance.bo.Remarksbo">
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    ccid, sid, record_time,  record1, record2, record3,record4, record5, record6, record7, record8, record9,
+      record10, record11, record12,record13, record14, record15,record16, record17, record18,
+      record19, record20, record21,record22, record23, record24,record25, record26, record27,
+      record28, record29, record30,record31, state, create_time, create_id, update_time, update_id
+  </sql>
+
+    <select id="findDetailByRecordTime" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"></include>
+        from u_attendance
+        where record_time = #{record_time,jdbcType=VARCHAR}
+        and ccid = #{ccid,jdbcType=VARCHAR}
+    </select>
+
+
+    <select id="findDetailByymd" parameterType="java.util.Map" resultMap="DetailResultMap">
+        select us.sid, us.name,
+        <if test="recordDay == '01'">
+            ua.record1
+        </if>
+        <if test="recordDay == '02'">
+            ua.record2
+        </if>
+        <if test="recordDay == '03'">
+            ua.record3
+        </if>
+        <if test="recordDay == '04'">
+            ua.record4
+        </if>
+        <if test="recordDay == '05'">
+            ua.record5
+        </if>
+        <if test="recordDay == '06'">
+            ua.record6
+        </if>
+        <if test="recordDay == '07'">
+            ua.record7
+        </if>
+        <if test="recordDay == '08'">
+            ua.record8
+        </if>
+        <if test="recordDay == '09'">
+            ua.record9
+        </if>
+        <if test="recordDay == '10'">
+            ua.record10
+        </if>
+        <if test="recordDay == '11'">
+            ua.record11
+        </if>
+        <if test="recordDay == '12'">
+            ua.record12
+        </if>
+        <if test="recordDay == '13'">
+            ua.record13
+        </if>
+        <if test="recordDay == '14'">
+            ua.record14
+        </if>
+        <if test="recordDay == '15'">
+            ua.record15
+        </if>
+        <if test="recordDay == '16'">
+            ua.record16
+        </if>
+        <if test="recordDay == '17'">
+            ua.record17
+        </if>
+        <if test="recordDay == '18'">
+            ua.record18
+        </if>
+        <if test="recordDay == '19'">
+            ua.record19
+        </if>
+        <if test="recordDay == '20'">
+            ua.record20
+        </if>
+        <if test="recordDay == '21'">
+            ua.record21
+        </if>
+        <if test="recordDay == '22'">
+            ua.record22
+        </if>
+        <if test="recordDay == '23'">
+            ua.record23
+        </if>
+        <if test="recordDay == '24'">
+            ua.record24
+        </if>
+        <if test="recordDay == '25'">
+            ua.record25
+        </if>
+        <if test="recordDay == '26'">
+            ua.record26
+        </if>
+        <if test="recordDay == '27'">
+            ua.record27
+        </if>
+        <if test="recordDay == '28'">
+            ua.record28
+        </if>
+        <if test="recordDay == '29'">
+            ua.record29
+        </if>
+        <if test="recordDay == '30'">
+            ua.record30
+        </if>
+        <if test="recordDay == '31'">
+            ua.record31
+        </if>
+        as record
+        from
+        (select
+        <include refid="Base_Column_List"></include>
+        from u_attendance
+        where record_time = #{record_time,jdbcType=VARCHAR}
+        and ccid = #{ccid,jdbcType=VARCHAR}
+        and
+        <if test="recordDay == '01'">
+            record1
+        </if>
+        <if test="recordDay == '02'">
+            record2
+        </if>
+        <if test="recordDay == '03'">
+            record3
+        </if>
+        <if test="recordDay == '04'">
+            record4
+        </if>
+        <if test="recordDay == '05'">
+            record5
+        </if>
+        <if test="recordDay == '06'">
+            record6
+        </if>
+        <if test="recordDay == '07'">
+            record7
+        </if>
+        <if test="recordDay == '08'">
+            record8
+        </if>
+        <if test="recordDay == '09'">
+            record9
+        </if>
+        <if test="recordDay == '10'">
+            record10
+        </if>
+        <if test="recordDay == '11'">
+            record11
+        </if>
+        <if test="recordDay == '12'">
+            record12
+        </if>
+        <if test="recordDay == '13'">
+            record13
+        </if>
+        <if test="recordDay == '14'">
+            record14
+        </if>
+        <if test="recordDay == '15'">
+            record15
+        </if>
+        <if test="recordDay == '16'">
+            record16
+        </if>
+        <if test="recordDay == '17'">
+            record17
+        </if>
+        <if test="recordDay == '18'">
+            record18
+        </if>
+        <if test="recordDay == '19'">
+            record19
+        </if>
+        <if test="recordDay == '20'">
+            record20
+        </if>
+        <if test="recordDay == '21'">
+            record21
+        </if>
+        <if test="recordDay == '22'">
+            record22
+        </if>
+        <if test="recordDay == '23'">
+            record23
+        </if>
+        <if test="recordDay == '24'">
+            record24
+        </if>
+        <if test="recordDay == '25'">
+            record25
+        </if>
+        <if test="recordDay == '26'">
+            record26
+        </if>
+        <if test="recordDay == '27'">
+            record27
+        </if>
+        <if test="recordDay == '28'">
+            record28
+        </if>
+        <if test="recordDay == '29'">
+            record29
+        </if>
+        <if test="recordDay == '30'">
+            record30
+        </if>
+        <if test="recordDay == '31'">
+            record31
+        </if>
+        != 0
+        ) ua
+        left join u_student us
+        on ua.sid = us.sid
+    </select>
+
+    <select id="findRemarksDetail" parameterType="java.lang.Long" resultMap="RemarksDetailResultMap">
+        SELECT
+               a.sid,a.name,b.remarks
+        FROM
+             u_attendance_remarks b left join u_student a
+        on a.sid = b.sid
+        WHERE b.caid = #{caid,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteBatchBySid" parameterType="java.util.Map">
+        delete from u_attendance
+        where record_time = #{record_time,jdbcType=VARCHAR}
+        and ccid = #{ccid,jdbcType=BIGINT}
+        and sid in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into u_attendance (ccid, sid, record_time,
+        record1, record2, record3,
+        record4, record5, record6,
+        record7, record8, record9,
+        record10, record11, record12,
+        record13, record14, record15,
+        record16, record17, record18,
+        record19, record20, record21,
+        record22, record23, record24,
+        record25, record26, record27,
+        record28, record29, record30,
+        record31, state, create_time,
+        create_id, update_time, update_id
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.ccid,jdbcType=BIGINT}, #{item.sid,jdbcType=BIGINT}, #{item.recordTime,jdbcType=VARCHAR},
+            #{item.record1,jdbcType=BIGINT}, #{item.record2,jdbcType=BIGINT}, #{item.record3,jdbcType=BIGINT},
+            #{item.record4,jdbcType=BIGINT}, #{item.record5,jdbcType=BIGINT}, #{item.record6,jdbcType=BIGINT},
+            #{item.record7,jdbcType=BIGINT}, #{item.record8,jdbcType=BIGINT},
+            #{item.record9,jdbcType=BIGINT}, #{item.record10,jdbcType=BIGINT}, #{item.record11,jdbcType=BIGINT},
+            #{item.record12,jdbcType=BIGINT}, #{item.record13,jdbcType=BIGINT}, #{item.record14,jdbcType=BIGINT},
+            #{item.record15,jdbcType=BIGINT}, #{item.record16,jdbcType=BIGINT}, #{item.record17,jdbcType=BIGINT},
+            #{item.record18,jdbcType=BIGINT}, #{item.record19,jdbcType=BIGINT}, #{item.record20,jdbcType=BIGINT},
+            #{item.record21,jdbcType=BIGINT}, #{item.record22,jdbcType=BIGINT}, #{item.record23,jdbcType=BIGINT},
+            #{item.record24,jdbcType=BIGINT}, #{item.record25,jdbcType=BIGINT}, #{item.record26,jdbcType=BIGINT},
+            #{item.record27,jdbcType=BIGINT}, #{item.record28,jdbcType=BIGINT}, #{item.record29,jdbcType=BIGINT},
+            #{item.record30,jdbcType=BIGINT}, #{item.record31,jdbcType=BIGINT}, #{item.state,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP},#{item.createId,jdbcType=BIGINT},
+            #{item.updateTime,jdbcType=TIMESTAMP},
+            #{item.updateId,jdbcType=BIGINT}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="insertRemarks" parameterType="java.util.List">
+        insert into u_attendance_remarks (caid,sid,remarks)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.caid,jdbcType=BIGINT}, #{item.sid,jdbcType=BIGINT}, #{item.remarks,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+</mapper>

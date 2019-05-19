@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UScheduleMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.USchedule">
+    <id column="usid" jdbcType="INTEGER" property="usid" />
+    <result column="weeks" jdbcType="VARCHAR" property="weeks" />
+    <result column="section" jdbcType="VARCHAR" property="section" />
+    <result column="course" jdbcType="VARCHAR" property="course" />
+    <result column="tname" jdbcType="VARCHAR" property="tname" />
+    <result column="place" jdbcType="VARCHAR" property="place" />
+    <result column="ccid" jdbcType="BIGINT" property="ccid" />
+    <result column="subscript" jdbcType="INTEGER" property="subscript" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    usid, weeks, section, course, tname, place, ccid, subscript
+  </sql>
+
+  <insert id="insert" parameterType="com.hp.common.model.USchedule">
+    insert into u_schedule ( weeks, section,
+      course, tname, place, 
+      ccid, subscript)
+    values (#{weeks,jdbcType=VARCHAR}, #{section,jdbcType=VARCHAR},
+      #{course,jdbcType=VARCHAR}, #{tname,jdbcType=VARCHAR}, #{place,jdbcType=VARCHAR}, 
+      #{ccid,jdbcType=INTEGER}, #{subscript,jdbcType=INTEGER})
+  </insert>
+
+  <select id="selectUScheduleWhetherInsert" parameterType="com.hp.common.model.USchedule" resultType="com.hp.common.model.USchedule">
+    SELECT * FROM u_schedule WHERE
+    (ccid=#{ccid} AND subscript=#{subscript}) OR
+    (subscript=#{subscript} AND tname=#{tname}) OR
+    (subscript=#{subscript} AND place=#{place})
+  </select>
+
+  <select id="selectUScheduleAllByccid" parameterType="java.lang.Long" resultType="com.hp.common.model.USchedule">
+    select * from u_schedule WHERE ccid = #{ccid}
+  </select>
+</mapper>

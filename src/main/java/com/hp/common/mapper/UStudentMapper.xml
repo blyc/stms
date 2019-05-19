@@ -1,0 +1,623 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UStudentMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UStudent">
+        <id column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="nation" jdbcType="VARCHAR" property="nation"/>
+        <result column="idcard" jdbcType="VARCHAR" property="idcard"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="education" jdbcType="VARCHAR" property="education"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="qq" jdbcType="VARCHAR" property="qq"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="province" jdbcType="VARCHAR" property="province"/>
+        <result column="city" jdbcType="VARCHAR" property="city"/>
+        <result column="politics" jdbcType="VARCHAR" property="politics"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="postcode" jdbcType="VARCHAR" property="postcode"/>
+        <result column="wcompany" jdbcType="VARCHAR" property="wcompany"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="u_c_cid" jdbcType="BIGINT" property="uCCid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="father_name" jdbcType="VARCHAR" property="fatherName"/>
+        <result column="mother_name" jdbcType="VARCHAR" property="motherName"/>
+        <result column="father_tel" jdbcType="VARCHAR" property="fatherTel"/>
+        <result column="mother_tel" jdbcType="VARCHAR" property="motherTel"/>
+        <result column="other_name" jdbcType="VARCHAR" property="otherName"/>
+        <result column="other_tel" jdbcType="VARCHAR" property="otherTel"/>
+        <result column="roomcode" jdbcType="VARCHAR" property="roomcode"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        <result column="recruiter" jdbcType="VARCHAR" property="recruiter"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="create_name" jdbcType="VARCHAR" property="createName"/>
+        <result column="update_id" jdbcType="BIGINT" property="updateId"/>
+        <result column="update_name" jdbcType="VARCHAR" property="updateName"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap1" type="com.hp.common.model.UStudent" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+        </association>
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <id column="cid" property="cid" jdbcType="BIGINT"/>
+            <result column="id" property="id" jdbcType="VARCHAR"/>
+            <result column="ucompany_name" property="name" jdbcType="VARCHAR"/>
+            <result column="address" property="address" jdbcType="VARCHAR"/>
+            <result column="tel" property="tel" jdbcType="VARCHAR"/>
+            <result column="describtion" property="describtion" jdbcType="VARCHAR"/>
+            <result column="founded" property="founded" jdbcType="TIMESTAMP"/>
+        </association>
+
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <id column="mid" property="mid" jdbcType="BIGINT"/>
+            <result column="umajor_name" property="name" jdbcType="VARCHAR"/>
+            <result column="id" property="id" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+        sid, id, name, sex, nation, idcard, birthday, education, email, qq, tel, province,
+        city, politics, address, grade, postcode, wcompany, state, u_c_cid, cid, mid, father_name,
+        mother_name, father_tel, mother_tel, other_name, other_tel, roomcode, create_time,
+        update_time, stage, recruiter, create_id, create_name, update_id, update_name
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u1.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u1.idcard) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <!-- 校区-->
+            <if test="cid != null and cid !=''">
+                and (u1.u_c_cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <!-- 年级-->
+            <if test="grade!=null and grade!='' ">
+                and (
+                u1.grade =#{grade,jdbcType=BIGINT}
+                )
+            </if>
+            <!-- 专业-->
+            <if test="mid!=null and mid!='' ">
+                and (
+                u1.mid =#{mid,jdbcType=BIGINT}
+                )
+            </if>
+            <!-- 班级id-->
+            <if test="ccid!=null and ccid!='' ">
+                and (
+                u1.cid =#{ccid,jdbcType=BIGINT}
+                )
+            </if>
+            <!-- 班级名字-->
+            <if test="cname!=null and cname!='' ">
+                and (
+                u2.className = #{cname,jdbcType=VARCHAR}
+                )
+            </if>
+            <!-- 讲师-->
+            <if test="jsname!=null and jsname!='' ">
+                and (
+                u2.jsname = #{jsname,jdbcType=VARCHAR} or u2.dsname = #{jsname,jdbcType=VARCHAR}
+                )
+            </if>
+            <!-- 班主任-->
+            <if test="bzrname!=null and bzrname!='' ">
+                and (
+                u2.bzrname = #{bzrname,jdbcType=VARCHAR}
+                )
+            </if>
+            and u1.state!='删除'
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap1">
+        select u1.*,u2.*,u3.*,u4.*,u3.name ucompany_name,u4.name umajor_name
+        from u_student u1
+        left join v_class u2
+        on u1.cid = u2.ccid
+        and u1.u_c_cid= u2.cid
+        left join u_company u3
+        on u3.cid = u1.u_c_cid
+        left join u_major u4
+        on u1.mid = u4.mid
+        <include refid="where_all"/>
+        order by u1.u_c_cid asc , u1.cid  asc,u1.sid  asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(u1.sid)
+        from u_student u1
+        left join v_class u2
+        on u1.cid = u2.ccid
+        and u1.u_c_cid= u2.cid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectStudentCountByCid" resultType="java.lang.Integer" parameterType="java.lang.Long">
+    select count(*) from u_student
+    where cid = #{cid,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByParam" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from u_student
+        <where>
+            <if test="idcard!=null and idcard!=''">
+                and idcard=#{idcard,jdbcType=BIGINT}
+                AND state != '删除'
+            </if>
+            <if test="ccid!=null and ccid!=''">
+                and cid=#{ccid,jdbcType=BIGINT}
+            </if>
+            <if test="name!=null and name!=''">
+                and name LIKE #{name,jdbcType=VARCHAR}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByCid" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from u_student
+        where cid = #{cid,jdbcType=BIGINT}
+    </select>
+
+
+    <select id="selectWithoutClass" resultMap="BaseResultMap" parameterType="java.util.Map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_student
+        where cid ='' OR cid IS NULL
+        AND state != '退学'
+        AND state != '删除'
+        <if test="cid!=null and cid!=''">
+            AND u_c_cid= #{cid,jdbcType=BIGINT}
+        </if>
+        <if test="mid!=null and mid!=''">
+            AND mid= #{mid,jdbcType=BIGINT}
+        </if>
+        <if test="name!=null and name!=''">
+            AND name LIKE #{name,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_student
+        where sid = #{sid,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insertSelective" keyColumn="sid" keyProperty="sid" parameterType="com.hp.common.model.UStudent"
+            useGeneratedKeys="true">
+        insert into u_student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="nation != null">
+                nation,
+            </if>
+            <if test="idcard != null">
+                idcard,
+            </if>
+            <if test="birthday != null">
+                birthday,
+            </if>
+            <if test="education != null">
+                education,
+            </if>
+            <if test="email != null">
+                email,
+            </if>
+            <if test="qq != null">
+                qq,
+            </if>
+            <if test="tel != null">
+                tel,
+            </if>
+            <if test="province != null">
+                province,
+            </if>
+            <if test="city != null">
+                city,
+            </if>
+            <if test="politics != null">
+                politics,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="postcode != null">
+                postcode,
+            </if>
+            <if test="wcompany != null">
+                wcompany,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+            <if test="uCCid != null">
+                u_c_cid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="mid != null">
+                mid,
+            </if>
+            <if test="fatherName != null">
+                father_name,
+            </if>
+            <if test="motherName != null">
+                mother_name,
+            </if>
+            <if test="fatherTel != null">
+                father_tel,
+            </if>
+            <if test="motherTel != null">
+                mother_tel,
+            </if>
+            <if test="otherName != null">
+                other_name,
+            </if>
+            <if test="otherTel != null">
+                other_tel,
+            </if>
+            <if test="roomcode != null">
+                roomcode,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="stage != null">
+                stage,
+            </if>
+            <if test="recruiter != null">
+                recruiter,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="createName != null">
+                create_name,
+            </if>
+            <if test="updateId != null">
+                update_id,
+            </if>
+            <if test="updateName != null">
+                update_name,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="nation != null">
+                #{nation,jdbcType=VARCHAR},
+            </if>
+            <if test="idcard != null">
+                #{idcard,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="education != null">
+                #{education,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="province != null">
+                #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="politics != null">
+                #{politics,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="postcode != null">
+                #{postcode,jdbcType=VARCHAR},
+            </if>
+            <if test="wcompany != null">
+                #{wcompany,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="uCCid != null">
+                #{uCCid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="mid != null">
+                #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="fatherName != null">
+                #{fatherName,jdbcType=VARCHAR},
+            </if>
+            <if test="motherName != null">
+                #{motherName,jdbcType=VARCHAR},
+            </if>
+            <if test="fatherTel != null">
+                #{fatherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="motherTel != null">
+                #{motherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="otherName != null">
+                #{otherName,jdbcType=VARCHAR},
+            </if>
+            <if test="otherTel != null">
+                #{otherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="roomcode != null">
+                #{roomcode,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="stage != null">
+                #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="recruiter != null">
+                #{recruiter,jdbcType=VARCHAR},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createName != null">
+                #{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateId != null">
+                #{updateId,jdbcType=BIGINT},
+            </if>
+            <if test="updateName != null">
+                #{updateName,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UStudent">
+        update u_student
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="nation != null">
+                nation = #{nation,jdbcType=VARCHAR},
+            </if>
+            <if test="idcard != null">
+                idcard = #{idcard,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="education != null">
+                education = #{education,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="qq != null">
+                qq = #{qq,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="province != null">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="politics != null">
+                politics = #{politics,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="postcode != null">
+                postcode = #{postcode,jdbcType=VARCHAR},
+            </if>
+            <if test="wcompany != null">
+                wcompany = #{wcompany,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="uCCid != null">
+                u_c_cid = #{uCCid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="mid != null">
+                mid = #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="fatherName != null">
+                father_name = #{fatherName,jdbcType=VARCHAR},
+            </if>
+            <if test="motherName != null">
+                mother_name = #{motherName,jdbcType=VARCHAR},
+            </if>
+            <if test="fatherTel != null">
+                father_tel = #{fatherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="motherTel != null">
+                mother_tel = #{motherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="otherName != null">
+                other_name = #{otherName,jdbcType=VARCHAR},
+            </if>
+            <if test="otherTel != null">
+                other_tel = #{otherTel,jdbcType=VARCHAR},
+            </if>
+            <if test="roomcode != null">
+                roomcode = #{roomcode,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="stage != null">
+                stage = #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="recruiter != null">
+                recruiter = #{recruiter,jdbcType=VARCHAR},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createName != null">
+                create_name = #{createName,jdbcType=VARCHAR},
+            </if>
+            <if test="updateId != null">
+                update_id = #{updateId,jdbcType=BIGINT},
+            </if>
+            <if test="updateName != null">
+                update_name = #{updateName,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where sid = #{sid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UStudent">
+        update u_student
+        set id = #{id,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        sex = #{sex,jdbcType=VARCHAR},
+        nation = #{nation,jdbcType=VARCHAR},
+        idcard = #{idcard,jdbcType=VARCHAR},
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+        education = #{education,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        qq = #{qq,jdbcType=VARCHAR},
+        tel = #{tel,jdbcType=VARCHAR},
+        province = #{province,jdbcType=VARCHAR},
+        city = #{city,jdbcType=VARCHAR},
+        politics = #{politics,jdbcType=VARCHAR},
+        address = #{address,jdbcType=VARCHAR},
+        grade = #{grade,jdbcType=VARCHAR},
+        postcode = #{postcode,jdbcType=VARCHAR},
+        wcompany = #{wcompany,jdbcType=VARCHAR},
+        state = #{state,jdbcType=VARCHAR},
+        u_c_cid = #{uCCid,jdbcType=BIGINT},
+        cid = #{cid,jdbcType=BIGINT},
+        mid = #{mid,jdbcType=BIGINT},
+        father_name = #{fatherName,jdbcType=VARCHAR},
+        mother_name = #{motherName,jdbcType=VARCHAR},
+        father_tel = #{fatherTel,jdbcType=VARCHAR},
+        mother_tel = #{motherTel,jdbcType=VARCHAR},
+        other_name = #{otherName,jdbcType=VARCHAR},
+        other_tel = #{otherTel,jdbcType=VARCHAR},
+        roomcode = #{roomcode,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        stage = #{stage,jdbcType=VARCHAR},
+        recruiter = #{recruiter,jdbcType=VARCHAR},
+        create_id = #{createId,jdbcType=BIGINT},
+        create_name = #{createName,jdbcType=VARCHAR},
+        update_id = #{updateId,jdbcType=BIGINT},
+        update_name = #{updateName,jdbcType=VARCHAR}
+        where sid = #{sid,jdbcType=BIGINT}
+    </update>
+
+    <!--移出学生   班级为空  在此默认为空-->
+    <update id="updateCidBySid" parameterType="java.util.Map">
+        UPDATE u_student
+        <set>
+            cid = #{cid}
+        </set>
+        where sid IN
+        <foreach collection="list" item="it" index="index" separator="," open="(" close=")">
+            #{it.sid,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <!--删除班级所有学生-->
+    <update id="deleteStudentByCid" parameterType="com.hp.common.model.UClass">
+        UPDATE u_student
+        <set>
+            state = '删除'
+        </set>
+        where cid = #{ccid,jdbcType=BIGINT}
+    </update>
+</mapper>

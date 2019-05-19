@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UInterViewMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UInterView">
+        <id column="iid" jdbcType="BIGINT" property="iid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="motif" jdbcType="VARCHAR" property="motif"/>
+        <result column="begintime" jdbcType="DATE" property="begintime"/>
+        <result column="endtime" jdbcType="DATE" property="endtime"/>
+        <result column="comrate" jdbcType="DOUBLE" property="comrate"/>
+        <result column="createname" jdbcType="VARCHAR" property="createname"/>
+        <result column="createtime" jdbcType="DATE" property="createtime"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UInterView" extends="BaseResultMap">
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <id column="cid" property="cid" jdbcType="BIGINT"/>
+            <result column="company_id" property="id" jdbcType="VARCHAR"/>
+            <result column="company_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="uClass" javaType="com.hp.common.model.UClass">
+            <id column="ccid" property="ccid" jdbcType="BIGINT"/>
+            <result column="class_id" property="id" jdbcType="VARCHAR"/>
+            <result column="class_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    iid, cid, ccid, motif, begintime, endtime, comrate, createname, createtime
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(chdate) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(ccname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        select ul.*, uc1.name class_name, uc2.name company_name
+        from (select
+        <include refid="Base_Column_List"/>
+        from u_interview
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>)
+        ul
+        LEFT JOIN u_class uc1
+        ON ul.ccid=uc1.ccid
+        LEFT JOIN u_company uc2
+        ON ul.cid=uc2.cid
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*) from u_interview
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_interview
+        where iid = #{iid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_interview
+    where iid = #{iid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UInterView"
+            useGeneratedKeys="true" keyColumn="iid" keyProperty="iid">
+    insert into u_interview (iid, cid, ccid, 
+      motif, begintime, endtime, 
+      comrate, createname, createtime
+      )
+    values (#{iid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, 
+      #{motif,jdbcType=VARCHAR}, #{begintime,jdbcType=DATE}, #{endtime,jdbcType=DATE}, 
+      #{comrate,jdbcType=DOUBLE}, #{createname,jdbcType=VARCHAR}, #{createtime,jdbcType=DATE}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UInterView" keyColumn="iid" keyProperty="iid">
+        insert into u_interview
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="iid != null">
+                iid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="motif != null">
+                motif,
+            </if>
+            <if test="begintime != null">
+                begintime,
+            </if>
+            <if test="endtime != null">
+                endtime,
+            </if>
+            <if test="comrate != null">
+                comrate,
+            </if>
+            <if test="createname != null">
+                createname,
+            </if>
+            <if test="createtime != null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="iid != null">
+                #{iid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="motif != null">
+                #{motif,jdbcType=VARCHAR},
+            </if>
+            <if test="begintime != null">
+                #{begintime,jdbcType=DATE},
+            </if>
+            <if test="endtime != null">
+                #{endtime,jdbcType=DATE},
+            </if>
+            <if test="comrate != null">
+                #{comrate,jdbcType=DOUBLE},
+            </if>
+            <if test="createname != null">
+                #{createname,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                #{createtime,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UInterView">
+        update u_interview
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="motif != null">
+                motif = #{motif,jdbcType=VARCHAR},
+            </if>
+            <if test="begintime != null">
+                begintime = #{begintime,jdbcType=DATE},
+            </if>
+            <if test="endtime != null">
+                endtime = #{endtime,jdbcType=DATE},
+            </if>
+            <if test="comrate != null">
+                comrate = #{comrate,jdbcType=DOUBLE},
+            </if>
+            <if test="createname != null">
+                createname = #{createname,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createtime = #{createtime,jdbcType=DATE},
+            </if>
+        </set>
+        where iid = #{iid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UInterView">
+    update u_interview
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      motif = #{motif,jdbcType=VARCHAR},
+      begintime = #{begintime,jdbcType=DATE},
+      endtime = #{endtime,jdbcType=DATE},
+      comrate = #{comrate,jdbcType=DOUBLE},
+      createname = #{createname,jdbcType=VARCHAR},
+      createtime = #{createtime,jdbcType=DATE}
+    where iid = #{iid,jdbcType=BIGINT}
+  </update>
+</mapper>

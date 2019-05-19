@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UEmployeeMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UEmployee">
+        <id column="eid" jdbcType="BIGINT" property="eid"/>
+        <result column="pid" jdbcType="BIGINT" property="pid"/>
+        <result column="did" jdbcType="BIGINT" property="did"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="birthday" jdbcType="TIMESTAMP" property="birthday"/>
+        <result column="tel" jdbcType="VARCHAR" property="tel"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="shool" jdbcType="VARCHAR" property="shool"/>
+        <result column="major" jdbcType="VARCHAR" property="major"/>
+        <result column="education" jdbcType="VARCHAR" property="education"/>
+        <result column="img" jdbcType="VARCHAR" property="img"/>
+        <result column="idcard" jdbcType="VARCHAR" property="idcard"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+        <result column="entryday" jdbcType="TIMESTAMP" property="entryday"/>
+        <result column="lid" jdbcType="BIGINT" property="lid"/>
+        <result column="uerid" jdbcType="BIGINT" property="uerid"/>
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime"/>
+        <result column="pinyin" jdbcType="VARCHAR" property="pinyin"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UEmployee" extends="BaseResultMap">
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <id column="cid" property="cid" jdbcType="BIGINT"/>
+            <result column="company_id" property="id" jdbcType="VARCHAR"/>
+            <result column="company_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="uDepartment" javaType="com.hp.common.model.UDepartment">
+            <id column="did" property="did" jdbcType="BIGINT"/>
+            <result column="department_id" property="id" jdbcType="VARCHAR"/>
+            <result column="department_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+        <association property="uPosition" javaType="com.hp.common.model.UPosition">
+            <id column="pid" property="pid" jdbcType="BIGINT"/>
+            <result column="position_id" property="id" jdbcType="VARCHAR"/>
+            <result column="position_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+
+        <association property="uJsRank" javaType="com.hp.common.model.UJsRank">
+            <result column="type" jdbcType="VARCHAR" property="type"/>
+            <result column="level" jdbcType="VARCHAR" property="level"/>
+            <result column="subsidy" jdbcType="BIGINT" property="subsidy"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+   eid, pid, did, cid, id, name, sex, birthday, tel, email, shool, major, education,
+    img, idcard, state, entryday, lid, uerid, createtime, updatetime, pinyin
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="not_state">
+        AND state!='删除'
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(idcard) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+            <include refid="not_state"/>
+        </where>
+    </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_employee
+        where eid = #{eid,jdbcType=BIGINT}
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        select u1.*, u2.name company_name, u3.name department_name, u4.name position_name, u5.*
+        from(
+        select
+        <include refid="Base_Column_List"/>
+        from u_employee
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+        ) u1
+        left join u_company u2
+        on u1.cid = u2.cid
+        left join u_department u3
+        on u1.did = u3.did
+        left join u_position u4
+        on u1.pid = u4.pid
+        left join u_js_rank u5
+        on u1.lid = u5.lid
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(eid) from u_employee
+        <include refid="where_all"/>
+    </select>
+
+    <insert id="insert" keyColumn="eid" keyProperty="eid" parameterType="com.hp.common.model.UEmployee"
+            useGeneratedKeys="true">
+    insert into u_employee (eid, pid, did, cid,
+      id, name, sex, birthday,
+      tel, email, shool,
+      major, education, img,
+      idcard, state, entryday,
+      lid, uerid, createtime,
+      updatetime, pinyin)
+    values (#{eid,jdbcType=BIGINT}, #{pid,jdbcType=BIGINT}, #{did,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT},
+      #{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{birthday,jdbcType=TIMESTAMP},
+      #{tel,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{shool,jdbcType=VARCHAR},
+      #{major,jdbcType=VARCHAR}, #{education,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR},
+      #{idcard,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}, #{entryday,jdbcType=TIMESTAMP},
+      #{lid,jdbcType=BIGINT}, #{uerid,jdbcType=BIGINT}, #{createtime,jdbcType=TIMESTAMP},
+      #{updatetime,jdbcType=TIMESTAMP}, #{pinyin,jdbcType=VARCHAR})
+  </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UEmployee">
+        update u_employee
+        <set>
+            <if test="pid != null">
+                pid = #{pid,jdbcType=BIGINT},
+            </if>
+            <if test="did != null">
+                did = #{did,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tel != null">
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="email != null">
+                email = #{email,jdbcType=VARCHAR},
+            </if>
+            <if test="shool != null">
+                shool = #{shool,jdbcType=VARCHAR},
+            </if>
+            <if test="major != null">
+                major = #{major,jdbcType=VARCHAR},
+            </if>
+            <if test="education != null">
+                education = #{education,jdbcType=VARCHAR},
+            </if>
+            <if test="img != null">
+                img = #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="idcard != null">
+                idcard = #{idcard,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+            <if test="entryday != null">
+                entryday = #{entryday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lid != null">
+                lid = #{lid,jdbcType=BIGINT},
+            </if>
+            <if test="uerid != null">
+                uerid = #{uerid,jdbcType=BIGINT},
+            </if>
+            <if test="createtime != null">
+                createtime = #{createtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updatetime != null">
+                updatetime = #{updatetime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="pinyin != null">
+                pinyin = #{pinyin,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where eid = #{eid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UEmployee">
+        update u_employee
+        set pid = #{pid,jdbcType=BIGINT},
+        did = #{did,jdbcType=BIGINT},
+        cid = #{cid,jdbcType=BIGINT},
+        id = #{id,jdbcType=VARCHAR},
+        name = #{name,jdbcType=VARCHAR},
+        sex = #{sex,jdbcType=VARCHAR},
+        birthday = #{birthday,jdbcType=TIMESTAMP},
+        tel = #{tel,jdbcType=VARCHAR},
+        email = #{email,jdbcType=VARCHAR},
+        shool = #{shool,jdbcType=VARCHAR},
+        major = #{major,jdbcType=VARCHAR},
+        education = #{education,jdbcType=VARCHAR},
+        img = #{img,jdbcType=VARCHAR},
+        idcard = #{idcard,jdbcType=VARCHAR},
+        state = #{state,jdbcType=VARCHAR},
+        entryday = #{entryday,jdbcType=TIMESTAMP},
+        lid = #{lid,jdbcType=BIGINT},
+        uerid = #{uerid,jdbcType=BIGINT},
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+        pinyin = #{pinyin,jdbcType=VARCHAR}
+        where eid = #{eid,jdbcType=BIGINT}
+    </update>
+
+
+    <select id="findAllEmployee" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from u_employee
+        <where>
+            <if test="cid != null and cid !='' ">
+                and (cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="idcard != null and idcard !='' ">
+                and (idcard = #{idcard,jdbcType=VARCHAR})
+            </if>
+            <if test="eid != null and eid !='' ">
+                and (eid = #{eid,jdbcType=BIGINT})
+            </if>
+            <if test="tel != null and tel !='' ">
+                and (tel = #{tel,jdbcType=BIGINT})
+            </if>
+            <include refid="not_state"/>
+        </where>
+    </select>
+</mapper>

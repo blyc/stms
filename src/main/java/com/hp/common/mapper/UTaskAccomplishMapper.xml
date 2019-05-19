@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UTaskAccomplishMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UTaskAccomplish">
+        <id column="utid" jdbcType="BIGINT" property="utid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="taskgrade" jdbcType="BIGINT" property="taskgrade"/>
+        <result column="arrangementtime" jdbcType="TIMESTAMP" property="arrangementtime"/>
+        <result column="tid" jdbcType="BIGINT" property="tid"/>
+    </resultMap>
+
+    <resultMap id="uStudent" type="com.hp.common.model.UStudent">
+        <id column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="uStudent_name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+
+    <resultMap id="uClass" type="com.hp.common.model.UClass">
+        <id column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="uClass_name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+    <resultMap id="uTask" type="com.hp.common.model.UTask">
+        <id column="tid" jdbcType="BIGINT" property="tid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="tasknum" jdbcType="BIGINT" property="tasknum"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="mark" jdbcType="BIGINT" property="mark"/>
+        <result column="arrangementtime" jdbcType="TIMESTAMP" property="arrangementtime"/>
+        <result column="tasktype" jdbcType="VARCHAR" property="tasktype"/>
+        <result column="taskproject" jdbcType="VARCHAR" property="taskproject"/>
+        <result column="homework" jdbcType="VARCHAR" property="homework"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    utid, cid, ccid, sid, taskgrade, arrangementtime, tid
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_task_accomplish
+        where utid = #{utid,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectBytid" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_task_accomplish
+        where tid = #{tid,jdbcType=BIGINT}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_task_accomplish
+    where utid = #{utid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UTaskAccomplish">
+    insert into u_task_accomplish (utid, cid, ccid, 
+      sid, taskgrade, arrangementtime, 
+      tid)
+    values (#{utid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, 
+      #{sid,jdbcType=BIGINT}, #{taskgrade,jdbcType=BIGINT}, #{arrangementtime,jdbcType=TIMESTAMP}, 
+      #{tid,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UTaskAccomplish">
+        insert into u_task_accomplish
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="utid != null">
+                utid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="taskgrade != null">
+                taskgrade,
+            </if>
+            <if test="arrangementtime != null">
+                arrangementtime,
+            </if>
+            <if test="tid != null">
+                tid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="utid != null">
+                #{utid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="taskgrade != null">
+                #{taskgrade,jdbcType=BIGINT},
+            </if>
+            <if test="arrangementtime != null">
+                #{arrangementtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tid != null">
+                #{tid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UTaskAccomplish">
+        update u_task_accomplish
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                sid = #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="taskgrade != null">
+                taskgrade = #{taskgrade,jdbcType=BIGINT},
+            </if>
+            <if test="arrangementtime != null">
+                arrangementtime = #{arrangementtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tid != null">
+                tid = #{tid,jdbcType=BIGINT},
+            </if>
+        </set>
+        where utid = #{utid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UTaskAccomplish">
+    update u_task_accomplish
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      sid = #{sid,jdbcType=BIGINT},
+      taskgrade = #{taskgrade,jdbcType=BIGINT},
+      arrangementtime = #{arrangementtime,jdbcType=TIMESTAMP},
+      tid = #{tid,jdbcType=BIGINT}
+    where utid = #{utid,jdbcType=BIGINT}
+  </update>
+
+    <insert id="insertbatch" parameterType="java.util.List">
+        INSERT INTO u_task_accomplish (cid, ccid,
+        sid, taskgrade, arrangementtime, tid)VALUES
+        <foreach collection="list" item="it" index="index" separator=",">
+            (
+            #{it.cid,jdbcType=BIGINT}, #{it.ccid,jdbcType=BIGINT},
+            #{it.sid,jdbcType=BIGINT}, #{it.taskgrade,jdbcType=BIGINT}, #{it.arrangementtime,jdbcType=TIMESTAMP},
+            #{it.tid,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <resultMap id="BaseResultMapDetails" type="com.hp.common.model.UTaskAccomplish" extends="BaseResultMap">
+        <association property="uStudent" resultMap="uStudent"></association>
+        <association property="uClass" resultMap="uClass"></association>
+        <association property="uTask" resultMap="uTask"></association>
+    </resultMap>
+
+    <select id="findUtaskaccomplishName" resultMap="BaseResultMapDetails">
+    SELECT us.name uStudent_name, use1.*
+    FROM u_task_accomplish use1
+    LEFT JOIN u_student us
+    ON us.sid = use1.sid
+    WHERE use1.tid=#{tid}
+  </select>
+
+    <update id="updateGradeByPrimaryKey" parameterType="java.util.List">
+        <foreach collection="list" item="it" index="index" separator=";">
+            update u_task_accomplish
+            set taskgrade= #{it.taskgrade,jdbcType=BIGINT}
+            where utid = #{it.utid,jdbcType=BIGINT}
+        </foreach>
+
+    </update>
+
+    <select id="selectExamDetails" resultMap="BaseResultMapDetails">
+    SELECT us.name uStudent_name,uc.name uClass_name,use1.taskgrade ,use1.arrangementtime
+    FROM u_task_accomplish use1
+    LEFT JOIN u_task uce
+    ON use1.tid = uce.tid
+    LEFT JOIN u_class uc
+    ON uc.ccid = use1.ccid
+    LEFT JOIN u_student us
+    ON us.sid = use1.sid
+    WHERE use1.tid=#{tid}
+  </select>
+
+
+    <select id="selectUtaskBo" parameterType="java.lang.Long" resultType="com.hp.task.bo.UTaskbo">
+    SELECT
+    tid,
+    SUM(CASE WHEN taskgrade=1 THEN 1 ELSE 0 END) AS qualified,
+    SUM(CASE WHEN taskgrade=1 THEN 1 ELSE 0 END)/COUNT(*) AS qualifiedrate
+    FROM
+    u_task_accomplish
+    WHERE  tid = #{tid}
+    GROUP BY tid
+  </select>
+
+    <select id="exporeStudentProjectGrade" parameterType="java.lang.Long"
+            resultType="com.hp.task.bo.UTaskAccomplishResults">
+    SELECT
+    us.name,
+    uta.taskgrade
+    FROM u_task_accomplish uta
+    LEFT JOIN u_student us
+    ON uta.sid = us.sid
+    WHERE tid=#{tid}
+  </select>
+
+    <select id="exporeClassProjectGrade" parameterType="java.lang.Long" resultType="com.hp.task.bo.UTaskResults">
+    SELECT uc.NAME cname  FROM u_task ut,u_class uc WHERE uc.ccid = ut.`ccid` AND ut.tid=#{tid}
+
+  </select>
+</mapper>

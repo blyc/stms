@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UApplicationDetailMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UApplicationDetail">
+        <id column="adid" jdbcType="BIGINT" property="adid"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="number" jdbcType="BIGINT" property="number"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="mname" jdbcType="VARCHAR" property="mname"/>
+        <result column="edition" jdbcType="VARCHAR" property="edition"/>
+        <result column="salesprice" jdbcType="BIGINT" property="salesprice"/>
+        <result column="price" jdbcType="BIGINT" property="price"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        <result column="aid" jdbcType="BIGINT" property="aid"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+    adid, mid, number, remarks, mname, edition, salesprice, price, stage, aid, grade
+   </sql>
+    <sql id="where_all">
+        <where>
+            <if test="aid!=null and aid!=''">
+                and (aid = #{aid,jdbcType=BIGINT})
+            </if>
+            <if test="cid!=null and cid!=''">
+                and aid in (select aid from u_application where cid = #{cid,jdbcType=BIGINT})
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_applicationdetail
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(adid) from u_applicationdetail
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_applicationdetail
+        where adid = #{adid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from u_applicationdetail
+        where adid = #{adid,jdbcType=BIGINT}
+    </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UApplicationDetail">
+        insert into u_applicationdetail (adid, mid, number,
+        remarks, mname, edition,
+        salesprice, price, stage,
+        aid, grade)
+        values (#{adid,jdbcType=BIGINT}, #{mid,jdbcType=BIGINT}, #{number,jdbcType=BIGINT},
+        #{remarks,jdbcType=VARCHAR}, #{mname,jdbcType=VARCHAR}, #{edition,jdbcType=VARCHAR},
+        #{salesprice,jdbcType=BIGINT}, #{price,jdbcType=BIGINT}, #{stage,jdbcType=VARCHAR},
+        #{aid,jdbcType=BIGINT}, #{grade,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UApplicationDetail">
+        insert into u_applicationdetail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="adid != null">
+                adid,
+            </if>
+            <if test="mid != null">
+                mid,
+            </if>
+            <if test="number != null">
+                number,
+            </if>
+            <if test="remarks != null">
+                remarks,
+            </if>
+            <if test="mname != null">
+                mname,
+            </if>
+            <if test="edition != null">
+                edition,
+            </if>
+            <if test="salesprice != null">
+                salesprice,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="stage != null">
+                stage,
+            </if>
+            <if test="aid != null">
+                aid,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="adid != null">
+                #{adid,jdbcType=BIGINT},
+            </if>
+            <if test="mid != null">
+                #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=BIGINT},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="mname != null">
+                #{mname,jdbcType=VARCHAR},
+            </if>
+            <if test="edition != null">
+                #{edition,jdbcType=VARCHAR},
+            </if>
+            <if test="salesprice != null">
+                #{salesprice,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=BIGINT},
+            </if>
+            <if test="stage != null">
+                #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="aid != null">
+                #{aid,jdbcType=BIGINT},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UApplicationDetail">
+        update u_applicationdetail
+        <set>
+            <if test="mid != null">
+                mid = #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                number = #{number,jdbcType=BIGINT},
+            </if>
+            <if test="remarks != null">
+                remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="mname != null">
+                mname = #{mname,jdbcType=VARCHAR},
+            </if>
+            <if test="edition != null">
+                edition = #{edition,jdbcType=VARCHAR},
+            </if>
+            <if test="salesprice != null">
+                salesprice = #{salesprice,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=BIGINT},
+            </if>
+            <if test="stage != null">
+                stage = #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="aid != null">
+                aid = #{aid,jdbcType=BIGINT},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where adid = #{adid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UApplicationDetail">
+    update u_applicationdetail
+    set mid = #{mid,jdbcType=BIGINT},
+      number = #{number,jdbcType=BIGINT},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      mname = #{mname,jdbcType=VARCHAR},
+      edition = #{edition,jdbcType=VARCHAR},
+      salesprice = #{salesprice,jdbcType=BIGINT},
+      price = #{price,jdbcType=BIGINT},
+      stage = #{stage,jdbcType=VARCHAR},
+      aid = #{aid,jdbcType=BIGINT},
+      grade = #{grade,jdbcType=VARCHAR}
+    where adid = #{adid,jdbcType=BIGINT}
+  </update>
+</mapper>

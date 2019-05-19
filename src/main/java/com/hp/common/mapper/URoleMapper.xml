@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hp.common.dao.URoleMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.URole">
+        <id column="rid" property="rid" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="type" property="type" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    rid, name, type
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(name) like CONCAT("%",#{findContent,jdbcType=VARCHAR},"%") or
+                LOWER(type) like CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")
+                )
+            </if>
+        </where>
+    </sql>
+
+    <!-- ====================================		初始化数据（调用存储过程）	========================================= -->
+    <insert id="initData">
+		{call init_shiro_demo()}
+	</insert>
+
+    <!-- ====================================		初始化数据（调用存储过程）	========================================= -->
+
+    <select id="findRoleByUserId" resultType="java.lang.String">
+  		select r.type from u_role r,u_user_role ur where ur.rid = r.rid and ur.uid = #{id,jdbcType=BIGINT}
+  </select>
+    <!-- 普通的分页查询 -->
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_role
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+    </select>
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(rid) from u_role
+        <include refid="where_all"/>
+    </select>
+
+    <!-- 选择角色给用户 ，checkbox 列表-->
+    <select id="selectRoleByUserId" resultType="com.hp.permission.bo.URoleBo">
+        <!--
+      select ur.id,ur.name,ur.type,ifnull(uu.id,0)marker from u_role ur
+      left join u_user_role uur on uur.uid = ur.id
+      left join (select id from u_user where id =#{id,jdbcType=BIGINT}) uu on uu.id = uur.uid
+      group by ur.id
+       -->
+        select ur.id,ur.name,ur.type,ifnull(uur.uid,0) marker from u_role ur
+        left join(select * from u_user_role where uid=#{id,jdbcType=BIGINT}) uur on uur.rid = ur.id
+    </select>
+
+    <!-- 权限分配的分页查询 -->
+    <select id="findRoleAndPermission" resultType="com.hp.permission.bo.RolePermissionAllocationBo">
+        select ur.rid,ur.type,ur.name,group_concat(up.name) permissionNames,group_concat(up.pid)permissionIds from
+        u_role ur
+        left join u_role_permission urp on urp.rid = ur.rid
+        left join u_permission up on up.pid = urp.pid
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(ur.name) like CONCAT("%",#{findContent,jdbcType=VARCHAR},"%") or
+                LOWER(ur.type) like CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")
+                )
+            </if>
+        </where>
+        group by ur.rid
+        <include refid="limit_sql"/>
+    </select>
+
+    <!-- Mybatis 一对多 Demo  begin -->
+
+    <!-- 查询用户全部的role & permission -->
+    <resultMap id="findNowAllPermission_resultMap" extends="BaseResultMap" type="com.hp.common.model.URole">
+        <collection property="permissions" javaType="com.hp.common.model.UPermission">
+            <id column="pid" property="pid" jdbcType="BIGINT"/>
+            <result column="pname" property="name" jdbcType="VARCHAR"/>
+            <result column="url" property="url" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+    <!-- 根据用户ID，查询所有权限 -->
+    <select id="findNowAllPermission" resultMap="findNowAllPermission_resultMap">
+    SELECT ur.rid,ur.name,ur.type ,up.pid pid,up.url,up.name pname
+        FROM (SELECT rid FROM u_user_role WHERE uid = #{userId,jdbcType=BIGINT}) uur
+        LEFT JOIN u_role ur ON uur.rid = ur.rid
+        LEFT JOIN u_role_permission urp ON urp.rid = ur.rid
+        LEFT JOIN u_permission up ON up.pid = urp.pid
+  </select>
+    <!-- Mybatis 一对多 Demo  end -->
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_role
+    where rid = #{rid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insertSelective" useGeneratedKeys="true" keyProperty="rid" parameterType="com.hp.common.model.URole">
+        insert into u_role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rid != null">
+                rid,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rid != null">
+                #{rid,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+  </mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hp.common.dao.UDepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UDepartment">
+        <id column="did" property="did" jdbcType="BIGINT"/>
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="describtion" property="describtion" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    did, id, name, describtion, createtime
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAllDepartMent" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_department
+    </select>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_department
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(did) from u_department
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from u_department
+        where name = #{name}
+    </select>
+
+    <select id="findByEmployeeCount" resultType="java.util.Map">
+        SELECT ud.name,COUNT(ue.did) AS 'count'
+        FROM
+        u_department ud
+        LEFT JOIN
+        u_employee ue
+        ON ud.did=ue.did
+        GROUP BY ud.name;
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="did" parameterType="com.hp.common.model.UDepartment" >
+        insert into u_department(did, id, name, describtion, createtime)
+        values(#{did,jdbcType=BIGINT},#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},
+               #{describtion,jdbcType=VARCHAR},#{createtime,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from u_department
+        where did=#{did}
+    </select>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UDepartment">
+        update u_department
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="describtion != null">
+                describtion = #{describtion,jdbcType=VARCHAR},
+            </if>
+            <if test="createtime != null">
+                createtime = #{createtime,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where did=#{did,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from u_department
+        where did = #{did,jdbcType=BIGINT}
+    </delete>
+
+</mapper>

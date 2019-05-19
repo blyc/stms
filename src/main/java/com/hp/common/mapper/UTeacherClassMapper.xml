@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UTeacherClassMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UTeacherClass">
+    <result column="eid" jdbcType="BIGINT" property="eid" />
+    <result column="cid" jdbcType="BIGINT" property="cid" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="position" jdbcType="VARCHAR" property="position" />
+  </resultMap>
+  <insert id="insert" parameterType="com.hp.common.model.UTeacherClass">
+    insert into u_teacher_class (eid, cid, position)
+    values (#{eid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{position,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hp.common.model.UTeacherClass">
+    insert into u_teacher_class
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eid != null">
+        eid,
+      </if>
+      <if test="cid != null">
+        cid,
+      </if>
+      <if test="startTime != null">
+        start_time,
+      </if>
+      <if test="endTime != null">
+        end_time,
+      </if>
+      <if test="position != null">
+        position,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eid != null">
+        #{eid,jdbcType=BIGINT},
+      </if>
+      <if test="cid != null">
+        #{cid,jdbcType=BIGINT},
+      </if>
+      <if test="startTime != null">
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null">
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="position != null">
+        #{position,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByCidAndPosition" parameterType="com.hp.common.model.UTeacherClass" >
+    update u_teacher_class
+    <set >
+        eid = #{eid,jdbcType=BIGINT}
+    </set>
+    where cid = #{cid,jdbcType=BIGINT} and position = #{position,jdbcType=VARCHAR}
+  </update>
+
+  <select id="findByCidAndPosition" parameterType="java.util.Map" resultMap="BaseResultMap">
+    select eid,cid,start_time,end_time,position
+    from u_teacher_class
+    where cid = #{ccid,jdbcType=BIGINT}
+  </select>
+
+</mapper>

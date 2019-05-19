@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UEmployeeRankMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UEmployeeRank">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="lid" jdbcType="BIGINT" property="lid"/>
+        <result column="eid" jdbcType="BIGINT" property="eid"/>
+        <result column="start_time" jdbcType="DATE" property="startTime"/>
+        <result column="end_time" jdbcType="DATE" property="endTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, lid, eid,start_time, end_time, create_time, create_id
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_employee_rank
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_employee_rank
+        WHERE DATE_FORMAT(start_time,'%Y-%m') = #{start_time,jdbcType=VARCHAR}
+        AND eid=#{eid,jdbcType=BIGINT}
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_employee_rank
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UEmployeeRank">
+    insert into u_employee_rank (id, lid, eid,start_time,
+      end_time, create_time, create_id
+      )
+    values (#{id,jdbcType=BIGINT},#{lid,jdbcType=BIGINT}, #{eid,jdbcType=BIGINT},#{startTime,jdbcType=DATE},
+      #{endTime,jdbcType=DATE}, #{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=BIGINT}
+      )
+  </insert>
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" useGeneratedKeys="true"
+            parameterType="com.hp.common.model.UEmployeeRank">
+        insert into u_employee_rank
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="lid != null">
+                lid,
+            </if>
+            <if test="eid != null">
+                eid,
+            </if>
+            <if test="startTime != null">
+                start_time,
+            </if>
+            <if test="endTime != null">
+                end_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="lid != null">
+                #{lid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="startTime != null">
+                #{startTime,jdbcType=DATE},
+            </if>
+            <if test="endTime != null">
+                #{endTime,jdbcType=DATE},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UEmployeeRank">
+        update u_employee_rank
+        <set>
+            <if test="lid != null">
+                lid = #{lid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                eid = #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime,jdbcType=DATE},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime,jdbcType=DATE},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UEmployeeRank">
+    update u_employee_rank
+    set  lid = #{lid,jdbcType=BIGINT},
+       eid = #{eid,jdbcType=BIGINT},
+      start_time = #{startTime,jdbcType=DATE},
+      end_time = #{endTime,jdbcType=DATE},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_id = #{createId,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

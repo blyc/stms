@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hp.common.dao.UApplicationMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UApplication">
+        <id column="aid" jdbcType="BIGINT" property="aid"/>
+        <result column="adate" jdbcType="TIMESTAMP" property="adate"/>
+        <result column="Applicant" jdbcType="VARCHAR" property="applicant"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="campus" jdbcType="VARCHAR" property="campus"/>
+        <result column="Zipcode" jdbcType="BIGINT" property="zipcode"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="Addressee1" jdbcType="VARCHAR" property="addressee1"/>
+        <result column="Telephone1" jdbcType="VARCHAR" property="telephone1"/>
+        <result column="Tel1" jdbcType="VARCHAR" property="tel1"/>
+        <result column="Addressee2" jdbcType="VARCHAR" property="addressee2"/>
+        <result column="Telephone2" jdbcType="VARCHAR" property="telephone2"/>
+        <result column="Tel2" jdbcType="VARCHAR" property="tel2"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="number" jdbcType="BIGINT" property="number"/>
+        <result column="price" jdbcType="BIGINT" property="price"/>
+        <result column="img" jdbcType="VARCHAR" property="img"/>
+        <result column="remarks" jdbcType="VARCHAR" property="remarks"/>
+        <result column="state" jdbcType="BIGINT" property="state"/>
+    </resultMap>
+    <!--书籍信息表-->
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UApplication" extends="BaseResultMap">
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <id column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+        </association>
+    </resultMap>
+    <sql id="Base_Column_List">
+   aid, adate, applicant, cid, campus, zipcode, address, addressee1, telephone1, tel1,
+    addressee2, telephone2, tel2, mid, img, remarks, state
+  </sql>
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(Applicant) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(campus) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!=''">
+                and (cid = #{cid,jdbcType=BIGINT})
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        SELECT u1.*,u2.mid,u2.name, u3.totalnum as number, u3.totalprice as price
+        FROM
+        (SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_application
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+        ) u1
+        LEFT JOIN u_major u2
+        ON u1.mid = u2.mid
+        LEFT JOIN
+        (SELECT aid, SUM(number) totalnum, SUM(price) totalprice
+        FROM u_applicationDetail
+        GROUP BY aid) u3
+        ON u1.aid =u3.aid
+        ORDER BY adate DESC
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(aid) from u_application
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_application
+        where aid = #{aid,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectUApplicationBycampus" parameterType="com.hp.common.model.UApplication"
+            resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_application WHERE campus = #{campus}
+    </select>
+    <select id="selectALL" resultType="com.hp.common.model.UApplicationALL">
+        SELECT u1.*,u2.mid,u2.name FROM
+        (SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_application
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+        ) u1
+        LEFT JOIN u_major u2
+        ON u1.mid = u2.mid ORDER BY adate DESC
+    </select>
+    <insert id="saveUApplication" parameterType="com.hp.common.model.UApplication">
+        insert into u_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="aid != null">
+                aid,
+            </if>
+            <if test="adate != null">
+                adate,
+            </if>
+            <if test="applicant != null">
+                Applicant,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="campus != null">
+                campus,
+            </if>
+            <if test="zipcode != null">
+                Zipcode,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="addressee1 != null">
+                Addressee1,
+            </if>
+            <if test="telephone1 != null">
+                Telephone1,
+            </if>
+            <if test="tel1 != null">
+                Tel1,
+            </if>
+            <if test="addressee2 != null">
+                Addressee2,
+            </if>
+            <if test="telephone2 != null">
+                Telephone2,
+            </if>
+            <if test="tel2 != null">
+                Tel2,
+            </if>
+            <if test="mid != null">
+                mid,
+            </if>
+            <if test="number != null">
+                Number,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="img != null">
+                img,
+            </if>
+            <if test="remarks != null">
+                Remarks,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="aid != null">
+                #{aid,jdbcType=BIGINT},
+            </if>
+            <if test="adate != null">
+                #{adate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applicant != null">
+                #{applicant,jdbcType=VARCHAR},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="campus != null">
+                #{campus,jdbcType=VARCHAR},
+            </if>
+            <if test="zipcode != null">
+                #{zipcode,jdbcType=BIGINT},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee1 != null">
+                #{addressee1,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone1 != null">
+                #{telephone1,jdbcType=VARCHAR},
+            </if>
+            <if test="tel1 != null">
+                #{tel1,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee2 != null">
+                #{addressee2,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone2 != null">
+                #{telephone2,jdbcType=VARCHAR},
+            </if>
+            <if test="tel2 != null">
+                #{tel2,jdbcType=VARCHAR},
+            </if>
+            <if test="mid != null">
+                #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=BIGINT},
+            </if>
+            <if test="img != null">
+                #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.hp.common.model.UApplication">
+        insert into u_application
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="aid != null">
+                aid,
+            </if>
+            <if test="adate != null">
+                adate,
+            </if>
+            <if test="applicant != null">
+                Applicant,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="campus != null">
+                campus,
+            </if>
+            <if test="zipcode != null">
+                Zipcode,
+            </if>
+            <if test="address != null">
+                address,
+            </if>
+            <if test="addressee1 != null">
+                Addressee1,
+            </if>
+            <if test="telephone1 != null">
+                Telephone1,
+            </if>
+            <if test="tel1 != null">
+                Tel1,
+            </if>
+            <if test="addressee2 != null">
+                Addressee2,
+            </if>
+            <if test="telephone2 != null">
+                Telephone2,
+            </if>
+            <if test="tel2 != null">
+                Tel2,
+            </if>
+            <if test="mid != null">
+                mid,
+            </if>
+            <if test="number != null">
+                Number,
+            </if>
+            <if test="price != null">
+                price,
+            </if>
+            <if test="img != null">
+                img,
+            </if>
+            <if test="remarks != null">
+                Remarks,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="aid != null">
+                #{aid,jdbcType=BIGINT},
+            </if>
+            <if test="adate != null">
+                #{adate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applicant != null">
+                #{applicant,jdbcType=VARCHAR},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="campus != null">
+                #{campus,jdbcType=VARCHAR},
+            </if>
+            <if test="zipcode != null">
+                #{zipcode,jdbcType=BIGINT},
+            </if>
+            <if test="address != null">
+                #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee1 != null">
+                #{addressee1,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone1 != null">
+                #{telephone1,jdbcType=VARCHAR},
+            </if>
+            <if test="tel1 != null">
+                #{tel1,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee2 != null">
+                #{addressee2,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone2 != null">
+                #{telephone2,jdbcType=VARCHAR},
+            </if>
+            <if test="tel2 != null">
+                #{tel2,jdbcType=VARCHAR},
+            </if>
+            <if test="mid != null">
+                #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                #{price,jdbcType=BIGINT},
+            </if>
+            <if test="img != null">
+                #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UApplication">
+        update u_application
+        <set>
+            <if test="adate != null">
+                adate = #{adate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="applicant != null">
+                Applicant = #{applicant,jdbcType=VARCHAR},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="campus != null">
+                campus = #{campus,jdbcType=VARCHAR},
+            </if>
+            <if test="zipcode != null">
+                Zipcode = #{zipcode,jdbcType=BIGINT},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee1 != null">
+                Addressee1 = #{addressee1,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone1 != null">
+                Telephone1 = #{telephone1,jdbcType=VARCHAR},
+            </if>
+            <if test="tel1 != null">
+                Tel1 = #{tel1,jdbcType=VARCHAR},
+            </if>
+            <if test="addressee2 != null">
+                Addressee2 = #{addressee2,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone2 != null">
+                Telephone2 = #{telephone2,jdbcType=VARCHAR},
+            </if>
+            <if test="tel2 != null">
+                Tel2 = #{tel2,jdbcType=VARCHAR},
+            </if>
+            <if test="mid != null">
+                mid = #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="number != null">
+                Number = #{number,jdbcType=BIGINT},
+            </if>
+            <if test="price != null">
+                price = #{price,jdbcType=BIGINT},
+            </if>
+            <if test="img != null">
+                img = #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="remarks != null">
+                Remarks = #{remarks,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=BIGINT},
+            </if>
+        </set>
+        where aid = #{aid,jdbcType=BIGINT}
+    </update>
+
+    <!--    <update id="updateByPrimaryKeySelective" parameterTycom.hp.common.model.UApplication">
+            update u_application SET  state = 1
+            where aid = #{aid,jdbcType=BIGINT}
+        </update>-->
+</mapper>

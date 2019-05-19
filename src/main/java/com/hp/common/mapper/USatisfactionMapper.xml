@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.USatisfactionMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.USatisfaction">
+        <id column="usid" jdbcType="BIGINT" property="usid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="eid" jdbcType="BIGINT" property="eid"/>
+        <result column="survey_time" jdbcType="TIMESTAMP" property="surveyTime"/>
+        <result column="score" jdbcType="DECIMAL" property="score"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="delete_flg" jdbcType="BIGINT" property="deleteFlg"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.USatisfaction" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+        <association property="uEmployee" javaType="com.hp.common.model.UEmployee">
+            <result column="name" jdbcType="VARCHAR" property="name"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    usid, ccid, cid, eid, survey_time, score, remark, create_id, create_time
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u3.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!=''">
+                and (u1.cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                DATE_FORMAT(u1.survey_time,'%Y-%m') = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        SELECT u1.*,u2.*,u3.*,
+        (CASE WHEN(((DATE_FORMAT(NOW(),_utf8'%d')>25) AND (DATE_FORMAT(NOW(),_utf8'%Y-%m')=DATE_FORMAT(u1.create_time,_utf8'%Y-%m')))OR((DATE_FORMAT(NOW(),_utf8'%Y-%m')!=DATE_FORMAT(u1.create_time,_utf8'%Y-%m'))))
+        THEN 0
+        ELSE 1
+        END) delete_flg
+        FROM u_satisfaction u1
+        LEFT JOIN
+        v_class u2
+        on u2.ccid = u1.ccid
+        LEFT join
+        u_employee u3
+        on u3.eid = u1.eid
+        <include refid="where_all"/>
+        order by u1.survey_time desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        FROM u_satisfaction u1
+        LEFT JOIN
+        v_class u2
+        on u2.ccid = u1.ccid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_satisfaction
+        where usid = #{usid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_satisfaction
+    where usid = #{usid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.USatisfaction">
+    insert into u_satisfaction (usid, ccid, cid, 
+      eid, survey_time, score, 
+      remark, create_id, create_time
+      )
+    values (#{usid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, 
+      #{eid,jdbcType=BIGINT}, #{surveyTime,jdbcType=TIMESTAMP}, #{score,jdbcType=DECIMAL}, 
+      #{remark,jdbcType=VARCHAR}, #{createId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.USatisfaction" keyProperty="usid"
+            useGeneratedKeys="true">
+        insert into u_satisfaction
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="usid != null">
+                usid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="eid != null">
+                eid,
+            </if>
+            <if test="surveyTime != null">
+                survey_time,
+            </if>
+            <if test="score != null">
+                score,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="usid != null">
+                #{usid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="surveyTime != null">
+                #{surveyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="score != null">
+                #{score,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.USatisfaction">
+        update u_satisfaction
+        <set>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                eid = #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="surveyTime != null">
+                survey_time = #{surveyTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="score != null">
+                score = #{score,jdbcType=DECIMAL},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where usid = #{usid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.USatisfaction">
+    update u_satisfaction
+    set ccid = #{ccid,jdbcType=BIGINT},
+      cid = #{cid,jdbcType=BIGINT},
+      eid = #{eid,jdbcType=BIGINT},
+      survey_time = #{surveyTime,jdbcType=TIMESTAMP},
+      score = #{score,jdbcType=DECIMAL},
+      remark = #{remark,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where usid = #{usid,jdbcType=BIGINT}
+  </update>
+</mapper>

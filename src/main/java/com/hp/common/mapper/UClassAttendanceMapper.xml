@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UClassAttendanceMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UClassAttendance">
+        <id column="caid" jdbcType="BIGINT" property="caid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="record_time" jdbcType="VARCHAR" property="recordTime"/>
+        <result column="section" jdbcType="VARCHAR" property="section"/>
+        <result column="scounts" jdbcType="BIGINT" property="scounts"/>
+        <result column="normal_count" jdbcType="BIGINT" property="normalCount"/>
+        <result column="late_count" jdbcType="BIGINT" property="lateCount"/>
+        <result column="leave_count" jdbcType="BIGINT" property="leaveCount"/>
+        <result column="truant_count" jdbcType="BIGINT" property="truantCount"/>
+        <result column="early_count" jdbcType="BIGINT" property="earlyCount"/>
+        <result column="rate" jdbcType="DECIMAL" property="rate"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="update_id" jdbcType="BIGINT" property="updateId"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMap1" type="com.hp.common.model.UClassAttendance" extends="BaseResultMap">
+        <id column="caid" jdbcType="BIGINT" property="caid"/>
+        <result column="arid" jdbcType="BIGINT" property="arid"/>
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    caid, ccid, record_time, section, scounts, normal_count, late_count, leave_count,
+    truant_count, early_count, rate, create_time, create_id, update_time, update_id
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!='' ">
+                and (u2.cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="startQueryDate!=null and startQueryDate!='' ">
+                and (
+                u1.record_time &gt;= #{startQueryDate,jdbcType=DATE}
+                )
+            </if>
+            <if test="endQueryDate!=null and endQueryDate!='' ">
+                and (
+                u1.record_time &lt;=  #{endQueryDate,jdbcType=DATE}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap1">
+        select u1.*, u2.*, u3.arid
+        from u_class_attendance u1
+        left join v_class u2
+        on u1.ccid = u2.ccid
+        LEFT JOIN u_attendance_remarks u3
+        ON u1.caid = u3.caid
+        <include refid="where_all"/>
+        order by u1. create_time desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(caid) from
+        u_class_attendance u1
+        left join v_class u2
+        on u1.ccid = u2.ccid
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class_attendance
+        where caid = #{caid,jdbcType=BIGINT}
+    </select>
+
+
+    <insert id="insertSelective" keyColumn="caid" keyProperty="caid"
+            parameterType="com.hp.common.model.UClassAttendance" useGeneratedKeys="true">
+        insert into u_class_attendance
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="caid != null">
+                caid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="recordTime != null">
+                record_time,
+            </if>
+            <if test="section != null">
+                section,
+            </if>
+            <if test="scounts != null">
+                scounts,
+            </if>
+            <if test="normalCount != null">
+                normal_count,
+            </if>
+            <if test="lateCount != null">
+                late_count,
+            </if>
+            <if test="leaveCount != null">
+                leave_count,
+            </if>
+            <if test="truantCount != null">
+                truant_count,
+            </if>
+            <if test="earlyCount != null">
+                early_count,
+            </if>
+            <if test="rate != null">
+                rate,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="updateId != null">
+                update_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="caid != null">
+                #{caid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="recordTime != null">
+                #{recordTime,jdbcType=VARCHAR},
+            </if>
+            <if test="section != null">
+                #{section,jdbcType=VARCHAR},
+            </if>
+            <if test="scounts != null">
+                #{scounts,jdbcType=BIGINT},
+            </if>
+            <if test="normalCount != null">
+                #{normalCount,jdbcType=BIGINT},
+            </if>
+            <if test="lateCount != null">
+                #{lateCount,jdbcType=BIGINT},
+            </if>
+            <if test="leaveCount != null">
+                #{leaveCount,jdbcType=BIGINT},
+            </if>
+            <if test="truantCount != null">
+                #{truantCount,jdbcType=BIGINT},
+            </if>
+            <if test="earlyCount != null">
+                #{earlyCount,jdbcType=BIGINT},
+            </if>
+            <if test="rate != null">
+                #{rate,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateId != null">
+                #{updateId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UClassAttendance">
+        update u_class_attendance
+        <set>
+            <if test="scounts != null">
+                scounts = #{scounts,jdbcType=BIGINT},
+            </if>
+            <if test="normalCount != null">
+                normal_count = #{normalCount,jdbcType=BIGINT},
+            </if>
+            <if test="lateCount != null">
+                late_count = #{lateCount,jdbcType=BIGINT},
+            </if>
+            <if test="leaveCount != null">
+                leave_count = #{leaveCount,jdbcType=BIGINT},
+            </if>
+            <if test="truantCount != null">
+                truant_count = #{truantCount,jdbcType=BIGINT},
+            </if>
+            <if test="earlyCount != null">
+                early_count = #{earlyCount,jdbcType=BIGINT},
+            </if>
+            <if test="rate != null">
+                rate = #{rate,jdbcType=DECIMAL},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateId != null">
+                update_id = #{updateId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where caid = #{caid,jdbcType=BIGINT}
+    </update>
+</mapper>

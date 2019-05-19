@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hp.common.dao.UCompanyMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UCompany">
+        <id column="cid" property="cid" jdbcType="BIGINT"/>
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="tel" property="tel" jdbcType="VARCHAR"/>
+        <result column="describtion" property="describtion" jdbcType="VARCHAR"/>
+        <result column="founded" property="founded" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    cid, id, name, address, tel, describtion, founded
+   </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(address) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_company
+        <include refid="where_all"/>
+        order by cid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(cid) from u_company
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findAllCompany" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_company
+    </select>
+
+    <select id="findByStudentCount" resultType="java.util.Map">
+        select uc.name,count(us.u_c_cid) as 'count'
+        from  u_company uc
+        left join
+        u_student us
+        on uc.cid=us.u_c_cid
+        group by uc.name;
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from u_company
+        where cid=#{cid}
+    </select>
+
+    <select id="findByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from u_company
+        where name = #{name}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="cid" parameterType="com.hp.common.model.UCompany">
+      insert into u_company(cid, id, name, address, tel, describtion, founded)
+      values(#{cid,jdbcType=BIGINT},#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
+      #{tel,jdbcType=VARCHAR},#{describtion,jdbcType=VARCHAR},#{founded,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UCompany">
+        update u_company
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="address != null">
+                address = #{address,jdbcType=VARCHAR},
+            </if>
+            <if test="tel != null">
+                tel = #{tel,jdbcType=VARCHAR},
+            </if>
+            <if test="describtion != null">
+                describtion = #{describtion,jdbcType=VARCHAR},
+            </if>
+            <if test="founded != null">
+                founded = #{founded,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where cid=#{cid,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+      delete from u_company
+      where cid = #{cid,jdbcType=BIGINT}
+    </delete>
+</mapper>

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UReviewExamMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UReviewExam">
+        <id column="reid" jdbcType="BIGINT" property="reid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="review_time" jdbcType="TIMESTAMP" property="reviewTime"/>
+        <result column="qualified_num" jdbcType="BIGINT" property="qualifiedNum"/>
+        <result column="noqualified_num" jdbcType="BIGINT" property="noqualifiedNum"/>
+        <result column="review_num" jdbcType="BIGINT" property="reviewNum"/>
+        <result column="review_rate" jdbcType="DECIMAL" property="reviewRate"/>
+        <result column="qualified" jdbcType="DECIMAL" property="qualified"/>
+        <result column="ceid" jdbcType="BIGINT" property="ceid"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    reid, cid, ccid, review_time, qualified_num, noqualified_num, review_num, review_rate, qualified, ceid
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_review_exam
+        where reid = #{reid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_review_exam
+    where reid = #{reid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert"  useGeneratedKeys="true" keyColumn="reid" keyProperty="reid" parameterType="com.hp.common.model.UReviewExam">
+    insert into u_review_exam (reid, cid, ccid, review_time, qualified_num,
+      noqualified_num, review_num, review_rate, qualified,
+      ceid)
+    values (#{reid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, #{reviewTime,jdbcType=TIMESTAMP}, #{qualifiedNum,jdbcType=BIGINT},
+      #{noqualifiedNum,jdbcType=BIGINT}, #{reviewNum,jdbcType=BIGINT}, #{reviewRate,jdbcType=DECIMAL},  #{qualified,jdbcType=DECIMAL},
+      #{ceid,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective"  useGeneratedKeys="true" keyColumn="reid" keyProperty="reid" parameterType="com.hp.common.model.UReviewExam">
+        insert into u_review_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="reid != null">
+                reid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="reviewTime != null">
+                review_time,
+            </if>
+            <if test="qualifiedNum != null">
+                qualified_num,
+            </if>
+            <if test="noqualifiedNum != null">
+                noqualified_num,
+            </if>
+            <if test="reviewNum != null">
+                review_num,
+            </if>
+            <if test="reviewRate != null">
+                review_rate,
+            </if>
+            <if test="qualified != null">
+                qualified,
+            </if>
+            <if test="ceid != null">
+                ceid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="reid != null">
+                #{reid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewTime != null">
+                #{reviewTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="qualifiedNum != null">
+                #{qualifiedNum,jdbcType=BIGINT},
+            </if>
+            <if test="noqualifiedNum != null">
+                #{noqualifiedNum,jdbcType=BIGINT},
+            </if>
+            <if test="reviewNum != null">
+                #{reviewNum,jdbcType=BIGINT},
+            </if>
+            <if test="reviewRate != null">
+                #{reviewRate,jdbcType=DECIMAL},
+            </if>
+            <if test="qualified != null">
+                #{qualified,jdbcType=DECIMAL},
+            </if>
+            <if test="ceid != null">
+                #{ceid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UReviewExam">
+        update u_review_exam
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewTime != null">
+                review_time = #{reviewTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="qualifiedNum != null">
+                qualified_num = #{qualifiedNum,jdbcType=BIGINT},
+            </if>
+            <if test="noqualifiedNum != null">
+                noqualified_num = #{noqualifiedNum,jdbcType=BIGINT},
+            </if>
+            <if test="reviewNum != null">
+                review_num = #{reviewNum,jdbcType=BIGINT},
+            </if>
+            <if test="reviewRate != null">
+                review_rate = #{reviewRate,jdbcType=DECIMAL},
+            </if>
+            <if test="qualified != null">
+                qualified = #{qualified,jdbcType=DECIMAL},
+            </if>
+            <if test="ceid != null">
+                ceid = #{ceid,jdbcType=BIGINT},
+            </if>
+        </set>
+        where reid = #{reid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UReviewExam">
+    update u_review_exam
+    set cid = #{cid,jdbcType=BIGINT},
+        ccid = #{ccid,jdbcType=BIGINT},
+     review_time = #{reviewTime,jdbcType=TIMESTAMP},
+      qualified_num = #{qualifiedNum,jdbcType=BIGINT},
+      noqualified_num = #{noqualifiedNum,jdbcType=BIGINT},
+      review_num = #{reviewNum,jdbcType=BIGINT},
+       review_rate = #{reviewRate,jdbcType=DECIMAL},
+      qualified = #{qualified,jdbcType=DECIMAL},
+      ceid = #{ceid,jdbcType=BIGINT}
+    where reid = #{reid,jdbcType=BIGINT}
+  </update>
+</mapper>

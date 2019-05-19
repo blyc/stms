@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UClassExamMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UClassExam">
+        <id column="ceid" jdbcType="BIGINT" property="ceid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="examtype" jdbcType="VARCHAR" property="examtype"/>
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="examtime" jdbcType="TIMESTAMP" property="examtime"/>
+        <result column="uid" jdbcType="VARCHAR" property="uid"/>
+        <result column="examsite" jdbcType="VARCHAR" property="examsite"/>
+        <result column="examnum" jdbcType="BIGINT" property="examnum"/>
+        <result column="ratestandard" jdbcType="DOUBLE" property="rateStandard"/>
+        <result column="mark" jdbcType="BIGINT" property="mark"/>
+        <result column="examproject" jdbcType="VARCHAR" property="examproject"/>
+        <result column="invigilator" jdbcType="VARCHAR" property="invigilator"/>
+        <result column="qualifiedrate" jdbcType="DECIMAL" property="qualifiedrate"/>
+        <result column="examevent" jdbcType="VARCHAR" property="examevent"/>
+        <result column="delete_flg" jdbcType="BIGINT" property="deleteFlg"/>
+        <result column="import_flg" jdbcType="BIGINT" property="importFlg"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndCompany" type="com.hp.common.model.UClassExam" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="BaseResultMapReview" type="com.hp.common.model.UClassExam" extends="BaseResultMapAndCompany">
+        <association property="uReviewExam" javaType="com.hp.common.model.UReviewExam">
+            <id column="reid" jdbcType="BIGINT" property="reid"/>
+            <result column="review_time" jdbcType="TIMESTAMP" property="reviewTime"/>
+            <result column="qualified_num" jdbcType="BIGINT" property="qualifiedNum"/>
+            <result column="noqualified_num" jdbcType="BIGINT" property="noqualifiedNum"/>
+            <result column="review_num" jdbcType="BIGINT" property="reviewNum"/>
+            <result column="review_rate" jdbcType="BIGINT" property="reviewRate"/>
+            <result column="qualified" jdbcType="DECIMAL" property="qualified"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    ceid, cid, ccid, examtype, createtime, examtime, ratestandard, uid, examsite, examnum, mark ,examproject ,invigilator,qualifiedrate,examevent
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="ccid != null and ccid !='' ">
+                and (
+                u1.ccid = #{ccid,jdbcType=BIGINT}
+                )
+            </if>
+            <!-- 根据校区id查询-->
+            <if test="cid != null and cid !='' ">
+                and (
+                u1.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                DATE_FORMAT(u1.examtime,'%Y-%m') = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndCompany">
+        SELECT u1.*,u2.*,
+        (CASE WHEN(((DATE_FORMAT(NOW(),_utf8'%d')>25) AND (DATE_FORMAT(NOW(),_utf8'%Y-%m')=DATE_FORMAT(u1.createtime,_utf8'%Y-%m')))OR((DATE_FORMAT(NOW(),_utf8'%Y-%m')!=DATE_FORMAT(u1.createtime,_utf8'%Y-%m'))))
+        THEN 0
+        ELSE 1
+        END) delete_flg,
+        (CASE WHEN(((DATE_FORMAT(NOW(),_utf8'%d')>25) AND (DATE_FORMAT(NOW(),_utf8'%Y-%m')=DATE_FORMAT(u1.createtime,_utf8'%Y-%m')))OR((DATE_FORMAT(NOW(),_utf8'%Y-%m')!=DATE_FORMAT(u1.createtime,_utf8'%Y-%m'))))
+        THEN 0
+        ELSE 1
+        END) import_flg
+        FROM u_class_exam u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        <include refid="where_all"/>
+        order by u1.examtime desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        SELECT count(*)
+        FROM u_class_exam u1
+        LEFT JOIN
+        v_class u2
+        on u2.ccid = u1.ccid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="findReviewAll" resultMap="BaseResultMapReview">
+        SELECT *
+        FROM u_class_exam u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        LEFT JOIN u_review_exam u3
+        ON u1.ceid=u3.ceid
+        <include refid="where_all"/>
+        order by u1.examtime desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findReviewCount" resultMap="BaseResultMapReview">
+        SELECT count(*)
+        FROM u_class_exam u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        LEFT JOIN u_review_exam u3
+        ON u1.ceid=u3.ceid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class_exam
+        where ceid = #{ceid,jdbcType=BIGINT}
+    </select>
+
+
+    <insert id="insert" parameterType="com.hp.common.model.UClassExam" keyColumn="ceid" keyProperty="ceid"
+            useGeneratedKeys="true">
+        insert into u_class_exam (ceid, cid, ccid,
+        examtype, createtime, examtime,
+        uid, examsite, examnum,ratestandard,
+        mark,examproject ,invigilator)
+        values (#{ceid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT},
+        #{examtype,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{examtime,jdbcType=TIMESTAMP},
+        #{uid,jdbcType=VARCHAR}, #{examsite,jdbcType=VARCHAR}, #{examnum,jdbcType=BIGINT},#{rateStandard,jdbcType=DOUBLE},
+        #{mark,jdbcType=BIGINT},#{examproject,jdbcType=VARCHAR},#{invigilator,jdbcType=VARCHAR}
+       )
+    </insert>
+
+    <update id="updateMarkByPrimaryKey" parameterType="java.util.Map">
+        update u_class_exam SET
+        mark = 1
+        <if test="qualifiedrate != null ">
+            ,qualifiedrate = #{qualifiedrate,jdbcType=DECIMAL}
+        </if>
+        where ceid = #{ceid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateExameventByPrimaryKey" parameterType="com.hp.common.model.UClassExam">
+        update u_class_exam SET
+        examevent = #{examevent}
+        where ceid = #{ceid,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from u_class_exam
+        where ceid = #{ceid,jdbcType=BIGINT}
+    </delete>
+</mapper>
+

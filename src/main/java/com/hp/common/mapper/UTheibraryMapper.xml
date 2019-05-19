@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UTheibraryMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UTheibrary">
+    <id column="tid" jdbcType="BIGINT" property="tid" />
+    <result column="tnumber" jdbcType="BIGINT" property="tnumber" />
+    <result column="tdate" jdbcType="TIMESTAMP" property="tdate" />
+    <result column="did" jdbcType="BIGINT" property="did" />
+    <result column="edition" jdbcType="VARCHAR" property="edition" ></result>
+  </resultMap>
+  <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UTheibrary" extends="BaseResultMap">
+    <association property="udetails" javaType="com.hp.common.model.Udetails">
+      <id column="did" jdbcType="BIGINT" property="did" />
+      <result column="mid" jdbcType="BIGINT" property="mid" />
+      <result column="Price" jdbcType="BIGINT" property="price" />
+      <result column="Total" jdbcType="BIGINT" property="total" />
+    </association>
+    <association property="uMajor" javaType="com.hp.common.model.UMajor">
+      <id column="mid" property="mid" jdbcType="BIGINT"/>
+      <result column="name" property="name" jdbcType="VARCHAR"/>
+      <result column="id" property="id" jdbcType="VARCHAR"/>
+    </association>
+  </resultMap>
+  <sql id="Base_Column_List">
+    tid, tnumber, tdate, did,edition
+  </sql>
+
+  <sql id="where_all">
+    <where>
+      <if test="did != null and did !='' ">
+        and (
+        ut.did= #{did,jdbcType=BIGINT}
+        )
+      </if>
+    </where>
+  </sql>
+  <select id="findAll"  resultMap="BaseResultMapAndOther">
+SELECT * FROM u_theibrary ut
+LEFT JOIN u_details ud
+ON ut.did = ud.did
+LEFT JOIN u_major um
+ON ud.mid = um.mid
+<include refid="where_all"/>
+  </select>
+  <select id="findCount" resultMap="BaseResultMap">
+    select count(tid) from u_theibrary
+  </select>
+
+
+
+  <select id="findAllUTheibrary"  resultType="com.hp.common.model.UTheibraryALL">
+    SELECT * FROM u_theibrary ut
+    LEFT JOIN u_details ud
+    ON ut.did = ud.did
+    LEFT JOIN u_major um
+    ON ud.mid = um.mid
+    <include refid="where_all"/>
+  </select>
+
+
+  <insert id="insertUTheibrary" parameterType="com.hp.common.model.UTheibrary">
+    insert into u_theibrary
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="tid != null">
+        tid,
+      </if>
+      <if test="tnumber != null">
+        tnumber,
+      </if>
+      <if test="tdate != null">
+        tdate,
+      </if>
+      <if test="did != null">
+      did,
+    </if>
+      <if test="edition != null">
+        edition,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="tid != null">
+        #{tid,jdbcType=BIGINT},
+      </if>
+      <if test="tnumber != null">
+        #{tnumber,jdbcType=BIGINT},
+      </if>
+      <if test="tdate != null">
+        #{tdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="did != null">
+        #{did,jdbcType=BIGINT},
+      </if>
+      <if test="edition != null">
+        #{edition,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+
+
+</mapper>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UInterViewInfoMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UInterViewInfo">
+        <id column="infoid" jdbcType="BIGINT" property="infoid"/>
+        <result column="iid" jdbcType="BIGINT" property="iid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="patriarch" jdbcType="VARCHAR" property="patriarch"/>
+        <result column="patriarchtel" jdbcType="VARCHAR" property="patriarchtel"/>
+        <result column="comdate" jdbcType="DATE" property="comdate"/>
+        <result column="comcontent" jdbcType="VARCHAR" property="comcontent"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="state" jdbcType="VARCHAR" property="state"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UInterViewInfo" extends="BaseResultMap">
+        <association property="uStudent" javaType="com.hp.common.model.UStudent">
+            <id column="sid" property="sid" jdbcType="BIGINT"/>
+            <result column="student_cid" property="cid" jdbcType="BIGINT"/>
+            <result column="student_name" property="name" jdbcType="VARCHAR"/>
+            <result column="student_fatherName" property="fatherName" jdbcType="VARCHAR"/>
+            <result column="student_fatherTel" property="fatherTel" jdbcType="VARCHAR"/>
+            <result column="student_motherName" property="motherName" jdbcType="VARCHAR"/>
+            <result column="student_motherTel" property="motherTel" jdbcType="VARCHAR"/>
+            <result column="student_otherName" property="otherName" jdbcType="VARCHAR"/>
+            <result column="student_otherTel" property="otherTel" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    infoid, iid, sid, patriarch, patriarchtel, comdate, comcontent, remark, state
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(chdate) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(ccname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="iid != null and iid !='' ">
+                and (
+                iid = #{iid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        select us.sid,us.name student_name,us.father_name student_fatherName,us.father_tel student_fatherTel,
+        us.mother_name student_motherName,us.mother_tel student_motherTel,us.other_name student_otherName,
+        us.other_tel student_otherTel, ui.infoid, ui.iid, ui.patriarch, ui.patriarchtel, ui.comdate, ui.comcontent,
+        ui.remark,
+        CASE WHEN ui.state IS NULL THEN '0' ELSE ui.state END AS state
+        FROM (
+        select
+        <include refid="Base_Column_List"/>
+        from u_interviewinfo
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+        ) ui
+        left join u_student us
+        on us.sid = ui.sid
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*) from u_interviewinfo
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByCid" parameterType="java.lang.Long" resultMap="BaseResultMapAndOther">
+    select us.sid,us.name student_name,us.father_name student_fatherName,us.father_tel student_fatherTel,
+    us.mother_name student_motherName,us.mother_tel student_motherTel,us.other_name student_otherName,
+    us.other_tel student_otherTel,ui.patriarch,ui.patriarchtel,ui.comdate,ui.comcontent,ui.remark,
+    CASE WHEN ui.state IS NULL THEN '0' ELSE ui.state END AS state
+
+    from u_student us
+    LEFT JOIN u_interviewinfo ui
+    ON us.sid = ui.sid
+    where us.cid = #{cid,jdbcType=BIGINT}
+  </select>
+
+    <select id="selectComrateByCid" parameterType="java.lang.Long" resultType="java.lang.Double">
+    select
+    COUNT(ui.infoid)/COUNT(us.sid) AS comrate
+    from u_student us
+    LEFT JOIN u_interviewinfo ui
+    ON us.sid = ui.sid
+    where us.cid = #{cid,jdbcType=BIGINT}
+  </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_interviewinfo
+        where infoid = #{infoid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_interviewinfo
+    where infoid = #{infoid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into u_interviewinfo
+        (infoid, iid, sid,
+        patriarch, patriarchtel, comdate,
+        comcontent, remark, state
+        )
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.infoid,jdbcType=BIGINT}, #{item.iid,jdbcType=BIGINT}, #{item.sid,jdbcType=BIGINT},
+            #{item.patriarch,jdbcType=VARCHAR}, #{item.patriarchtel,jdbcType=VARCHAR}, #{item.comdate,jdbcType=DATE},
+            #{item.comcontent,jdbcType=VARCHAR}, #{item.remark,jdbcType=VARCHAR}, #{item.state,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+    <insert id="insert" parameterType="com.hp.common.model.UInterViewInfo">
+    insert into u_interviewinfo (infoid, iid, sid,
+      patriarch, patriarchtel, comdate,
+      comcontent, remark, state
+      )
+    values (#{infoid,jdbcType=BIGINT}, #{iid,jdbcType=BIGINT}, #{sid,jdbcType=BIGINT},
+      #{patriarch,jdbcType=VARCHAR}, #{patriarchtel,jdbcType=VARCHAR}, #{comdate,jdbcType=DATE},
+      #{comcontent,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{state,jdbcType=VARCHAR}
+      )
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UInterViewInfo">
+        insert into u_interviewinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="infoid != null">
+                infoid,
+            </if>
+            <if test="iid != null">
+                iid,
+            </if>
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="patriarch != null">
+                patriarch,
+            </if>
+            <if test="patriarchtel != null">
+                patriarchtel,
+            </if>
+            <if test="comdate != null">
+                comdate,
+            </if>
+            <if test="comcontent != null">
+                comcontent,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="state != null">
+                state,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="infoid != null">
+                #{infoid,jdbcType=BIGINT},
+            </if>
+            <if test="iid != null">
+                #{iid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="patriarch != null">
+                #{patriarch,jdbcType=VARCHAR},
+            </if>
+            <if test="patriarchtel != null">
+                #{patriarchtel,jdbcType=VARCHAR},
+            </if>
+            <if test="comdate != null">
+                #{comdate,jdbcType=DATE},
+            </if>
+            <if test="comcontent != null">
+                #{comcontent,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                #{state,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateUInterViewInfo" parameterType="com.hp.common.model.UInterViewInfo">
+        update u_interviewinfo
+        <set>
+            <if test="iid != null">
+                iid = #{iid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                sid = #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="patriarch != null">
+                patriarch = #{patriarch,jdbcType=VARCHAR},
+            </if>
+            <if test="patriarchtel != null">
+                patriarchtel = #{patriarchtel,jdbcType=VARCHAR},
+            </if>
+            <if test="comdate != null">
+                comdate = #{comdate,jdbcType=DATE},
+            </if>
+            <if test="comcontent != null">
+                comcontent = #{comcontent,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where infoid = #{infoid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UInterViewInfo">
+    update u_interviewinfo
+    set iid = #{iid,jdbcType=BIGINT},
+      sid = #{sid,jdbcType=BIGINT},
+      patriarch = #{patriarch,jdbcType=VARCHAR},
+      patriarchtel = #{patriarchtel,jdbcType=VARCHAR},
+      comdate = #{comdate,jdbcType=DATE},
+      comcontent = #{comcontent,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR}
+    where infoid = #{infoid,jdbcType=BIGINT}
+  </update>
+</mapper>

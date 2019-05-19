@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UStorageMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UStorage">
+        <id column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="sdate" jdbcType="TIMESTAMP" property="sdate"/>
+        <result column="snumber" jdbcType="BIGINT" property="snumber"/>
+        <result column="sname" jdbcType="VARCHAR" property="sname"/>
+        <result column="edition" jdbcType="VARCHAR" property="edition"/>
+        <result column="did" jdbcType="BIGINT" property="did"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UStorage" extends="BaseResultMap">
+        <association property="udetails" javaType="com.hp.common.model.Udetails">
+            <id column="did" jdbcType="BIGINT" property="did"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="Price" jdbcType="BIGINT" property="price"/>
+            <result column="Total" jdbcType="BIGINT" property="total"/>
+        </association>
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <id column="mid" property="mid" jdbcType="BIGINT"/>
+            <result column="name" property="name" jdbcType="VARCHAR"/>
+            <result column="id" property="id" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    sid, sdate, snumber, sname, did,edition
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="did != null and did !='' ">
+                and (
+                ut.did= #{did,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" parameterType="java.lang.Long" resultMap="BaseResultMapAndOther">
+        SELECT * FROM u_storage ut
+        LEFT JOIN u_details ud
+        ON ut.did = ud.did
+        LEFT JOIN u_major um
+        ON ud.mid = um.mid
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+    select count(sid) from u_Storage
+  </select>
+
+    <select id="findAllUSTorage" resultType="com.hp.common.model.UStorageALL">
+    SELECT * FROM u_storage ut
+    LEFT JOIN u_details ud
+    ON ut.did = ud.did
+    LEFT JOIN u_major um
+    ON ud.mid = um.mid
+
+  </select>
+
+    <insert id="insertUStorage" parameterType="com.hp.common.model.UStorage" useGeneratedKeys="true" keyProperty="sid"
+            keyColumn="sid">
+        insert into u_storage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="sdate != null">
+                sdate,
+            </if>
+            <if test="snumber != null">
+                snumber,
+            </if>
+            <if test="did != null">
+                did,
+            </if>
+            <if test="sname != null">
+                sname,
+            </if>
+            <if test="edition != null">
+                edition,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="sdate != null">
+                #{sdate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="snumber != null">
+                #{snumber,jdbcType=BIGINT},
+            </if>
+            <if test="did != null">
+                #{did,jdbcType=BIGINT},
+            </if>
+            <if test="sname != null">
+                #{sname,jdbcType=VARBINARY},
+            </if>
+            <if test="edition != null">
+                #{edition,jdbcType=VARBINARY},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UStudentExamMapper">
+    <resultMap id="uStudent" type="com.hp.common.model.UStudent">
+        <id column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="uStudent_name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+
+    <resultMap id="uClass" type="com.hp.common.model.UClass">
+        <id column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="uClass_name" jdbcType="VARCHAR" property="name"/>
+    </resultMap>
+
+    <resultMap id="uClassExam" type="com.hp.common.model.UClassExam">
+        <id column="ceid" jdbcType="BIGINT" property="ceid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="examtype" jdbcType="VARCHAR" property="examtype"/>
+        <result column="createtime" jdbcType="TIMESTAMP" property="createtime"/>
+        <result column="examtime" jdbcType="TIMESTAMP" property="examtime"/>
+        <result column="ratestandard" jdbcType="DOUBLE" property="rateStandard"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="examsite" jdbcType="VARCHAR" property="examsite"/>
+        <result column="examnum" jdbcType="DOUBLE" property="examnum"/>
+
+    </resultMap>
+
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UStudentExam">
+        <id column="useid" jdbcType="BIGINT" property="useid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ceid" jdbcType="BIGINT" property="ceid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="examgrade" jdbcType="DOUBLE" property="examgrade"/>
+        <result column="eaddr" jdbcType="VARCHAR" property="eaddr"/>
+        <result column="registerexam" jdbcType="TIMESTAMP" property="registerexam"/>
+
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+   useid, cid, ccid, sid, examgrade, eaddr, registerexam, ceid
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_student_exam
+        where cid = #{cid,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectStudentExam" resultMap="BaseResultMapDetails">
+        SELECT us.name uStudent_name, use1.*
+        FROM u_student_exam use1
+        LEFT JOIN u_student us
+        ON us.sid = use1.sid
+        WHERE use1.ceid=#{ceid}
+    </select>
+
+    <resultMap id="BaseResultMapDetails" type="com.hp.common.model.UStudentExam" extends="BaseResultMap">
+        <association property="uStudent" resultMap="uStudent"></association>
+        <association property="uClass" resultMap="uClass"></association>
+        <association property="uClassExam" resultMap="uClassExam"></association>
+    </resultMap>
+
+    <select id="selectExamDetails" parameterType="java.lang.Long" resultMap="BaseResultMapDetails">
+        SELECT  use1.*, uce.*,uc.name uClass_name, us.name uStudent_name
+        FROM u_student_exam use1
+        LEFT JOIN u_class_exam uce
+        ON use1.ceid = uce.ceid
+        LEFT JOIN u_class uc
+        ON uc.ccid = use1.ccid
+        LEFT JOIN u_student us
+        ON us.sid = use1.sid
+        WHERE use1.ceid=#{ceid} order by use1.examgrade DESC
+    </select>
+
+    <select id="selectClassExameBo" parameterType="java.lang.Long" resultType="com.hp.exam.bo.UCLassExamebo">
+        SELECT
+         u1.ceid,
+         MAX(u1.examgrade) AS hightgrade ,
+         MIN(u1.examgrade) AS lowgrade ,
+         AVG(u1.examgrade)  AS avggrade,
+         SUM(CASE WHEN u1.examgrade>=u2.ratestandard THEN 1 ELSE 0 END) AS qualified,
+         SUM(CASE WHEN u1.examgrade>=u2.ratestandard THEN 1 ELSE 0 END)/COUNT(*)*100 AS qualifiedrate
+         FROM
+         u_student_exam u1
+         left join u_class_exam u2
+         on u1.ceid = u2.ceid
+         WHERE  u1.ceid = #{ceid}
+         GROUP BY ceid
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_student_exam
+    where cid = #{cid,jdbcType=BIGINT}
+  </delete>
+
+    <delete id="deleteByCeid" parameterType="java.lang.Long">
+        delete from u_student_exam
+        where ceid = #{ceid,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.hp.common.model.UStudentExam">
+    insert into u_student_exam (useid, cid, ccid,
+      sid, examgrade, eaddr, registerexam,
+      ceid)
+    values (#{useid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT},
+      #{sid,jdbcType=BIGINT}, #{examgrade,jdbcType=DOUBLE}, #{eaddr,jdbcType=VARCHAR}, #{registerexam,jdbcType=TIMESTAMP},
+      #{ceid,jdbcType=BIGINT})
+  </insert>
+
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        INSERT INTO u_student_exam ( cid, ccid,
+        sid, examgrade, eaddr, registerexam, ceid)VALUES
+        <foreach collection="list" item="it" index="index" separator=",">
+            (
+            #{it.cid,jdbcType=BIGINT}, #{it.ccid,jdbcType=BIGINT},
+            #{it.sid,jdbcType=BIGINT}, #{it.examgrade,jdbcType=DOUBLE},#{it.eaddr,jdbcType=VARCHAR},
+            #{it.registerexam,jdbcType=TIMESTAMP},
+            #{it.ceid,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+
+    <insert id="insertSelective" parameterType="com.hp.common.model.UStudentExam">
+        insert into u_student_exam
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="useid != null">
+                useid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="examgrade != null">
+                examgrade,
+            </if>
+            <if test="eaddr != null">
+                eaddr,
+            </if>
+            <if test="registerexam != null">
+                registerexam,
+            </if>
+            <if test="ceid != null">
+                ceid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="useid != null">
+                #{useid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="examgrade != null">
+                #{examgrade,jdbcType=DOUBLE},
+            </if>
+            <if test="eaddr != null">
+                #{eaddr,jdbcType=VARCHAR},
+            </if>
+            <if test="registerexam != null">
+                #{registerexam,jdbcType=TIMESTAMP},
+            </if>
+            <if test="ceid != null">
+                #{ceid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UStudentExam">
+        update u_student_exam
+        <set>
+            <if test="examgrade != null">
+                examgrade = #{examgrade,jdbcType=DOUBLE},
+            </if>
+            <if test="eaddr != null">
+                eaddr = #{eaddr,jdbcType=VARCHAR},
+            </if>
+            <if test="registerexam != null">
+                registerexam=#{registerexam,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where useid = #{useid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateGradeByPrimaryKey" parameterType="com.hp.common.model.UStudentExam">
+        update u_student_exam
+        <set>
+            <if test="examgrade != null">
+                examgrade = #{examgrade,jdbcType=DOUBLE},
+            </if>
+            <if test="eaddr != null">
+                eaddr = #{eaddr,jdbcType=VARCHAR},
+            </if>
+            <if test="registerexam != null">
+                registerexam=#{registerexam,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where useid = #{useid,jdbcType=BIGINT}
+    </update>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="java.util.List">
+        <foreach collection="list" item="it" index="index" separator=";">
+            update u_student_exam
+            set
+            examgrade = #{it.examgrade,jdbcType=DOUBLE},
+            cid = #{it.cid,jdbcType=BIGINT},
+            ccid = #{it.ccid,jdbcType=BIGINT},
+            sid = #{it.sid,jdbcType=BIGINT}
+            where useid = #{it.useid,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+
+</mapper>

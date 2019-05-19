@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UCtypeMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UCtype">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="tname" jdbcType="VARCHAR" property="tname"/>
+        <result column="tnum" jdbcType="BIGINT" property="tnum"/>
+        <result column="tcount" jdbcType="BIGINT" property="tcount"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, tname, tnum, tcount
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_ctype
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByTname" parameterType="com.hp.common.model.UCtype" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_ctype
+        where tname = #{tname,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_ctype
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UCtype">
+        insert into u_ctype (id, tname, tnum,
+        tcount)
+        values (#{id,jdbcType=BIGINT}, #{tname,jdbcType=VARCHAR}, #{tnum,jdbcType=BIGINT},
+        #{tcount,jdbcType=BIGINT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UCtype">
+        insert into u_ctype
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="tname != null">
+                tname,
+            </if>
+            <if test="tnum != null">
+                tnum,
+            </if>
+            <if test="tcount != null">
+                tcount,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="tname != null">
+                #{tname,jdbcType=VARCHAR},
+            </if>
+            <if test="tnum != null">
+                #{tnum,jdbcType=BIGINT},
+            </if>
+            <if test="tcount != null">
+                #{tcount,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UCtype">
+        update u_ctype
+        <set>
+            <if test="tname != null">
+                tname = #{tname,jdbcType=VARCHAR},
+            </if>
+            <if test="tnum != null">
+                tnum = #{tnum,jdbcType=BIGINT},
+            </if>
+            <if test="tcount != null">
+                tcount = #{tcount,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UCtype">
+    update u_ctype
+    set tname = #{tname,jdbcType=VARCHAR},
+      tnum = #{tnum,jdbcType=BIGINT},
+      tcount = #{tcount,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+
+    <update id="updateTcountByPrimaryKey" parameterType="com.hp.common.model.UCtype">
+        update u_ctype
+        <set>
+            <if test="tcount != null">
+                tcount = tcount + #{tcount,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+</mapper>

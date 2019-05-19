@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UClassProjectMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UClassProject">
+        <id column="cpid" jdbcType="BIGINT" property="cpid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="description" jdbcType="VARCHAR" property="description"/>
+        <result column="start_time" jdbcType="DATE" property="startTime"/>
+        <result column="start_end" jdbcType="DATE" property="startEnd"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="flg" jdbcType="BIGINT" property="flg"/>
+        <result column="squalified" jdbcType="DECIMAL" property="squalified"/>
+        <result column="delete_flg" jdbcType="BIGINT" property="deleteFlg"/>
+        <result column="import_flg" jdbcType="BIGINT" property="importFlg"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndCompany" type="com.hp.common.model.UClassProject" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="BaseResultMapReview" type="com.hp.common.model.UClassProject" extends="BaseResultMapAndCompany">
+        <association property="uReviewProject" javaType="com.hp.common.model.UReviewProject">
+            <id column="rpid" jdbcType="BIGINT" property="rpid"/>
+            <result column="review_time" jdbcType="DATE" property="reviewTime"/>
+            <result column="qualified_num" jdbcType="BIGINT" property="qualifiedNum"/>
+            <result column="noqualified_num" jdbcType="BIGINT" property="noqualifiedNum"/>
+            <result column="review_num" jdbcType="BIGINT" property="reviewNum"/>
+            <result column="review_rate" jdbcType="DECIMAL" property="reviewRate"/>
+            <result column="qualified" jdbcType="DECIMAL" property="qualified"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    cpid, cid, ccid, name, description, start_time, start_end, create_time, create_id,squalified,
+    flg
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                u1.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                DATE_FORMAT(u1.start_time,'%Y-%m') = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndCompany">
+        select u1.*,u2.*,
+        (CASE WHEN(((DATE_FORMAT(NOW(),_utf8'%d')>25) AND (DATE_FORMAT(NOW(),_utf8'%Y-%m')=DATE_FORMAT(u1.create_time,_utf8'%Y-%m')))OR((DATE_FORMAT(NOW(),_utf8'%Y-%m')!=DATE_FORMAT(u1.create_time,_utf8'%Y-%m'))))
+        THEN 0
+        ELSE 1
+        END) delete_flg,
+        (CASE WHEN(((DATE_FORMAT(NOW(),_utf8'%d')>25) AND (DATE_FORMAT(NOW(),_utf8'%Y-%m')=DATE_FORMAT(u1.create_time,_utf8'%Y-%m')))OR((DATE_FORMAT(NOW(),_utf8'%Y-%m')!=DATE_FORMAT(u1.create_time,_utf8'%Y-%m'))))
+        THEN 0
+        ELSE 1
+        END) import_flg
+        from u_class_project u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        <include refid="where_all"/>
+        order by u1.create_time desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(u1.cpid)
+        from u_class_project u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findReviewAll" resultMap="BaseResultMapReview">
+        SELECT *
+        from u_class_project u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        LEFT JOIN u_review_project u3
+        ON u1.cpid=u3.cpid
+        <include refid="where_all"/>
+        order by u1.create_time desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findReviewCount" resultMap="BaseResultMapReview">
+        select count(*)
+        from u_class_project u1
+        LEFT JOIN v_class u2
+        on u2.ccid = u1.ccid
+        LEFT JOIN u_review_project u3
+        ON u1.cpid=u3.cpid
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class_project
+        where cpid = #{cpid,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insert" parameterType="com.hp.common.model.UClassProject" keyColumn="cpid" keyProperty="cpid"
+            useGeneratedKeys="true">
+        insert into u_class_project (cpid, cid, ccid,
+        name, description, start_time,
+        start_end, create_time, create_id,
+        flg)
+        values (#{cpid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT},
+        #{name,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{startTime,jdbcType=DATE},
+        #{startEnd,jdbcType=DATE}, #{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=BIGINT},
+        #{flg,jdbcType=BIGINT})
+    </insert>
+    <!--处理表示位-->
+    <update id="updateFlgByPrimaryKey" parameterType="com.hp.common.model.UClassProject">
+        update u_class_project SET
+        flg = 1
+        where cpid = #{cpid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateProjectGaradeBycpid" parameterType="com.hp.common.model.UClassProject">
+        UPDATE  u_class_project SET squalified = #{squalified,jdbcType=DECIMAL} WHERE cpid=#{cpid}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from u_class_project
+        where cpid = #{cpid,jdbcType=BIGINT}
+    </delete>
+</mapper>

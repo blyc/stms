@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UReviewProjectDetailMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UReviewProjectDetail">
+        <id column="rpdid" jdbcType="BIGINT" property="rpdid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="review_grade" jdbcType="DECIMAL" property="reviewGrade"/>
+        <result column="review_ok" jdbcType="BIT" property="reviewOk"/>
+        <result column="remake" jdbcType="VARCHAR" property="remake"/>
+        <result column="spid" jdbcType="BIGINT" property="spid"/>
+        <result column="rpid" jdbcType="BIGINT" property="rpid"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapProject" type="com.hp.common.model.UReviewProjectDetail" extends="BaseResultMap">
+        <association property="uStudent" javaType="com.hp.common.model.UStudent">
+            <result column="name" jdbcType="VARCHAR" property="name"></result>
+        </association>
+        <association property="uStudentProject" javaType="com.hp.common.model.UStudentProject">
+            <result column="vpass" jdbcType="BIGINT" property="vpass"></result>
+            <result column="vsubmit" jdbcType="BIGINT" property="vsubmit"></result>
+            <result column="vtime" jdbcType="VARCHAR" property="vtime"></result>
+        </association>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+    rpdid, cid, ccid, sid, review_grade, review_ok, remake, spid, rpid
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_review_project_detail
+        where rpdid = #{rpdid,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectByRpid" parameterType="java.lang.Long" resultMap="BaseResultMapProject">
+    SELECT urd.*,us1.name,us2.vpass,us2.vsubmit,us2.vtime
+    FROM u_review_project_detail urd
+    LEFT JOIN  u_student us1
+    ON urd.sid = us1.sid
+    LEFT JOIN u_student_project us2
+    ON urd.spid =us2.spid
+    WHERE urd.rpid  = #{rpid,jdbcType=BIGINT}
+  </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_review_project_detail
+    where rpdid = #{rpdid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UReviewProjectDetail">
+    insert into u_review_project_detail (rpdid, cid, ccid, 
+      sid, review_grade, review_ok, 
+      remake, spid, rpid)
+    values (#{rpdid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, 
+      #{sid,jdbcType=BIGINT}, #{reviewGrade,jdbcType=DECIMAL}, #{reviewOk,jdbcType=BIT}, 
+      #{remake,jdbcType=VARCHAR}, #{spid,jdbcType=BIGINT}, #{rpid,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UReviewProjectDetail">
+        insert into u_review_project_detail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rpdid != null">
+                rpdid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="reviewGrade != null">
+                review_grade,
+            </if>
+            <if test="reviewOk != null">
+                review_ok,
+            </if>
+            <if test="remake != null">
+                remake,
+            </if>
+            <if test="spid != null">
+                spid,
+            </if>
+            <if test="rpid != null">
+                rpid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rpdid != null">
+                #{rpdid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewGrade != null">
+                #{reviewGrade,jdbcType=DECIMAL},
+            </if>
+            <if test="reviewOk != null">
+                #{reviewOk,jdbcType=BIT},
+            </if>
+            <if test="remake != null">
+                #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="spid != null">
+                #{spid,jdbcType=BIGINT},
+            </if>
+            <if test="rpid != null">
+                #{rpid,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UReviewProjectDetail">
+        update u_review_project_detail
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="sid != null">
+                sid = #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="reviewGrade != null">
+                review_grade = #{reviewGrade,jdbcType=DECIMAL},
+            </if>
+            <if test="reviewOk != null">
+                review_ok = #{reviewOk,jdbcType=BIT},
+            </if>
+            <if test="remake != null">
+                remake = #{remake,jdbcType=VARCHAR},
+            </if>
+            <if test="spid != null">
+                spid = #{spid,jdbcType=BIGINT},
+            </if>
+            <if test="rpid != null">
+                rpid = #{rpid,jdbcType=BIGINT},
+            </if>
+        </set>
+        where rpdid = #{rpdid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UReviewProjectDetail">
+    update u_review_project_detail
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      sid = #{sid,jdbcType=BIGINT},
+      review_grade = #{reviewGrade,jdbcType=DECIMAL},
+      review_ok = #{reviewOk,jdbcType=BIT},
+      remake = #{remake,jdbcType=VARCHAR},
+      spid = #{spid,jdbcType=BIGINT},
+      rpid = #{rpid,jdbcType=BIGINT}
+    where rpdid = #{rpdid,jdbcType=BIGINT}
+  </update>
+</mapper>

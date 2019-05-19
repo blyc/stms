@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UQuestionReleaseMapper">
+
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UQuestionRelease">
+    <id column="qrid" jdbcType="BIGINT" property="qrid" />
+    <result column="qbid" jdbcType="BIGINT" property="qbid" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+    <result column="failureTime" jdbcType="TIMESTAMP" property="failureTime" />
+    <result column="ccid" jdbcType="BIGINT" property="ccid" />
+    <result column="foldername" jdbcType="VARCHAR" property="foldername" />
+    <result column="eid" jdbcType="BIGINT" property="eid" />
+    <result column="cid" jdbcType="BIGINT" property="cid" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    qrid, qbid, key, state, failureTime, ccid, foldername, eid, cid
+  </sql>
+
+  <sql id="limit_sql">
+    <if test="page_sql != null and page_sql != ''">
+      ${page_sql}
+    </if>
+  </sql>
+
+  <!--<sql id="where_all">
+    <where>
+      <if test="findContent != null and findContent !='' ">
+        and (LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")))
+      </if>
+      <if test="cid != null and cid !='' ">
+        and (cid = #{cid,jdbcType=BIGINT})
+      </if>
+      <if test="eid!=null and eid!='' ">
+        and (
+        ccid IN(
+        SELECT cid FROM
+        u_teacher_class
+        WHERE eid=#{eid,jdbcType=BIGINT})
+        )
+      </if>
+    </where>
+  </sql>-->
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from u_question_release
+    where qrid = #{qrid,jdbcType=BIGINT}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_question_release
+    where qrid = #{qrid,jdbcType=BIGINT}
+  </delete>
+
+  <insert id="insertSelective" parameterType="com.hp.common.model.UQuestionRelease">
+    insert into u_question_release
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="qrid != null">
+        qrid,
+      </if>
+      <if test="qbid != null">
+        qbid,
+      </if>
+      <if test="key != null">
+        key,
+      </if>
+      <if test="state != null">
+        state,
+      </if>
+      <if test="failureTime != null">
+        failureTime,
+      </if>
+      <if test="ccid != null">
+        ccid,
+      </if>
+      <if test="foldername != null">
+        foldername,
+      </if>
+      <if test="eid != null">
+        eid,
+      </if>
+      <if test="cid != null">
+        cid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="qrid != null">
+        #{qrid,jdbcType=BIGINT},
+      </if>
+      <if test="qbid != null">
+        #{qbid,jdbcType=BIGINT},
+      </if>
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="failureTime != null">
+        #{failureTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ccid != null">
+        #{ccid,jdbcType=BIGINT},
+      </if>
+      <if test="foldername != null">
+        #{foldername,jdbcType=VARCHAR},
+      </if>
+      <if test="eid != null">
+        #{eid,jdbcType=BIGINT},
+      </if>
+      <if test="cid != null">
+        #{cid,jdbcType=BIGINT},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UQuestionRelease">
+    update u_question_release
+    <set>
+      <if test="qbid != null">
+        qbid = #{qbid,jdbcType=BIGINT},
+      </if>
+      <if test="key != null">
+        key = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="state != null">
+        state = #{state,jdbcType=VARCHAR},
+      </if>
+      <if test="failureTime != null">
+        failureTime = #{failureTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="ccid != null">
+        ccid = #{ccid,jdbcType=BIGINT},
+      </if>
+      <if test="foldername != null">
+        foldername = #{foldername,jdbcType=VARCHAR},
+      </if>
+      <if test="eid != null">
+        eid = #{eid,jdbcType=BIGINT},
+      </if>
+      <if test="cid != null">
+        cid = #{cid,jdbcType=BIGINT},
+      </if>
+    </set>
+    where qrid = #{qrid,jdbcType=BIGINT}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UQuestionRelease">
+    update u_question_release
+    set qbid = #{qbid,jdbcType=BIGINT},
+      key = #{key,jdbcType=VARCHAR},
+      state = #{state,jdbcType=VARCHAR},
+      failureTime = #{failureTime,jdbcType=TIMESTAMP},
+      ccid = #{ccid,jdbcType=BIGINT},
+      foldername = #{foldername,jdbcType=VARCHAR},
+      eid = #{eid,jdbcType=BIGINT},
+      cid = #{cid,jdbcType=BIGINT}
+    where qrid = #{qrid,jdbcType=BIGINT}
+  </update>
+
+</mapper>

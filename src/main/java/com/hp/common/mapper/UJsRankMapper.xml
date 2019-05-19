@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UJsRankMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UJsRank">
+        <id column="lid" jdbcType="BIGINT" property="lid"/>
+        <result column="type" jdbcType="VARCHAR" property="type"/>
+        <result column="level" jdbcType="VARCHAR" property="level"/>
+        <result column="subsidy" jdbcType="BIGINT" property="subsidy"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    lid, type, level, subsidy
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(type) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(level) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM u_js_rank
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        FROM u_js_rank
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_js_rank
+        where lid = #{lid,jdbcType=BIGINT}
+    </select>
+
+
+    <select id="selectAllForSelect" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_js_rank
+    </select>
+
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_js_rank
+    where lid = #{lid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UJsRank">
+    insert into u_js_rank (lid, type, level, 
+      subsidy)
+    values (#{lid,jdbcType=BIGINT}, #{type,jdbcType=VARCHAR}, #{level,jdbcType=VARCHAR}, 
+      #{subsidy,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UJsRank">
+        insert into u_js_rank
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lid != null">
+                lid,
+            </if>
+            <if test="type != null">
+                type,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="subsidy != null">
+                subsidy,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lid != null">
+                #{lid,jdbcType=BIGINT},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="level != null">
+                #{level,jdbcType=VARCHAR},
+            </if>
+            <if test="subsidy != null">
+                #{subsidy,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UJsRank">
+        update u_js_rank
+        <set>
+            <if test="type != null">
+                type = #{type,jdbcType=VARCHAR},
+            </if>
+            <if test="level != null">
+                level = #{level,jdbcType=VARCHAR},
+            </if>
+            <if test="subsidy != null">
+                subsidy = #{subsidy,jdbcType=BIGINT},
+            </if>
+        </set>
+        where lid = #{lid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UJsRank">
+    update u_js_rank
+    set type = #{type,jdbcType=VARCHAR},
+      level = #{level,jdbcType=VARCHAR},
+      subsidy = #{subsidy,jdbcType=BIGINT}
+    where lid = #{lid,jdbcType=BIGINT}
+  </update>
+</mapper>

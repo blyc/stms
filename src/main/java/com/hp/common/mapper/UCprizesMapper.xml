@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UCprizesMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UCprizes">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="img" jdbcType="VARCHAR" property="img"/>
+        <result column="flg" jdbcType="BIGINT" property="flg"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, name, img, flg
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_cprizes
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectPrizes" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_cprizes
+        where flg=0
+        LIMIT 0,5
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_cprizes
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UCprizes">
+    insert into u_cprizes (id, name, img, 
+      flg)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR}, 
+      #{flg,jdbcType=BIGINT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UCprizes">
+        insert into u_cprizes
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="img != null">
+                img,
+            </if>
+            <if test="flg != null">
+                flg,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="img != null">
+                #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="flg != null">
+                #{flg,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UCprizes">
+        update u_cprizes
+        <set>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="img != null">
+                img = #{img,jdbcType=VARCHAR},
+            </if>
+            <if test="flg != null">
+                flg = #{flg,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UCprizes">
+    update u_cprizes
+    set name = #{name,jdbcType=VARCHAR},
+      img = #{img,jdbcType=VARCHAR},
+      flg = #{flg,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

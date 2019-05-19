@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UPaymentMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UPayment">
+        <id column="upid" jdbcType="BIGINT" property="upid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="num" jdbcType="BIGINT" property="num"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        <result column="payval" jdbcType="DECIMAL" property="payval"/>
+        <result column="paynum" jdbcType="BIGINT" property="paynum"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UPayment" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+    <sql id="Base_Column_List">
+    upid, cid, ccid, num, stage, payval, paynum, create_time
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!=''">
+                and (u1.cid = #{cid,jdbcType=BIGINT})
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        SELECT u1.*,u2.*
+        FROM u_payment u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+        order by u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(u1.upid)
+        FROM u_payment u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_payment
+        where upid = #{upid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_payment
+    where upid = #{upid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UPayment">
+    insert into u_payment (upid, cid, ccid, 
+      num, stage, payval, 
+      paynum, create_time)
+    values (#{upid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT},
+      #{num,jdbcType=BIGINT}, #{stage,jdbcType=VARCHAR}, #{payval,jdbcType=DECIMAL}, 
+      #{paynum,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UPayment" useGeneratedKeys="true"
+            keyProperty="upid">
+        insert into u_payment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="upid != null">
+                upid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="num != null">
+                num,
+            </if>
+            <if test="stage != null">
+                stage,
+            </if>
+            <if test="payval != null">
+                payval,
+            </if>
+            <if test="paynum != null">
+                paynum,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="upid != null">
+                #{upid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="num != null">
+                #{num,jdbcType=BIGINT},
+            </if>
+            <if test="stage != null">
+                #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="payval != null">
+                #{payval,jdbcType=DECIMAL},
+            </if>
+            <if test="paynum != null">
+                #{paynum,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UPayment">
+        update u_payment
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=BIGINT},
+            </if>
+            <if test="stage != null">
+                stage = #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="payval != null">
+                payval = #{payval,jdbcType=DECIMAL},
+            </if>
+            <if test="paynum != null">
+                paynum = #{paynum,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where upid = #{upid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UPayment">
+    update u_payment
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      num = #{num,jdbcType=BIGINT},
+      stage = #{stage,jdbcType=VARCHAR},
+      payval = #{payval,jdbcType=DECIMAL},
+      paynum = #{paynum,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where upid = #{upid,jdbcType=BIGINT}
+  </update>
+</mapper>

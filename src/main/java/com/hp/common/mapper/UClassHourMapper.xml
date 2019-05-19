@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UClassHourMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UClassHour">
+        <id column="uchid" jdbcType="BIGINT" property="uchid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="eid" jdbcType="BIGINT" property="eid"/>
+        <result column="survey_time" jdbcType="DATE" property="surveyTime"/>
+        <result column="count" jdbcType="BIGINT" property="count"/>
+        <result column="day_count" jdbcType="BIGINT" property="dayCount"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_flg" jdbcType="BIGINT" property="updateFlg"/>
+        <result column="delete_flg" jdbcType="BIGINT" property="deleteFlg"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndEmployee" type="com.hp.common.model.UClassHour" extends="BaseResultMap">
+        <association property="uEmployee" javaType="com.hp.common.model.UEmployee">
+            <result column="employee_name" jdbcType="VARCHAR" property="name"/>
+        </association>
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <result column="company_name" jdbcType="VARCHAR" property="name"/>
+        </association>
+    </resultMap>
+
+
+    <sql id="Base_Column_List">
+    uchid, ccid, cid, eid,survey_time, count, day_count, create_id, create_time
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u3.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!=''">
+                and (u1.cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                DATE_FORMAT(u1.survey_time,'%Y-%m') = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndEmployee">
+        SELECT u1.*
+        ,u2.name as employee_name,
+        u3.name as company_name,
+        (CASE WHEN(DATE_FORMAT(NOW(),_utf8'%Y-%m') != DATE_FORMAT(u1.create_time,_utf8'%Y-%m'))
+        THEN 0
+        ELSE 1
+        END) update_flg,
+        (CASE WHEN(DATE_FORMAT(NOW(),_utf8'%Y-%m') != DATE_FORMAT(u1.create_time,_utf8'%Y-%m'))
+        THEN 0
+        ELSE 1
+        END) delete_flg
+        FROM u_class_hour u1
+        LEFT JOIN
+        u_employee u2
+        ON u1.`eid` =u2.`eid`
+        LEFT JOIN u_company u3
+        ON u1.`cid` = u3.`cid`
+        <include refid="where_all"/>
+        order by u1.survey_time desc, u2.cid asc , u2.eid desc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        FROM u_class_hour u1
+        LEFT JOIN
+        u_employee u2
+        ON u1.`eid` =u2.`eid`
+        <include refid="where_all"/>
+    </select>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class_hour
+        where uchid = #{uchid,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_class_hour
+    where uchid = #{uchid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UClassHour">
+    insert into u_class_hour (uchid, ccid, cid, eid
+      survey_time, count, day_count, 
+      create_id, create_time)
+    values (#{uchid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{eid,jdbcType=BIGINT},
+      #{surveyTime,jdbcType=DATE}, #{count,jdbcType=BIGINT}, #{dayCount,jdbcType=BIGINT}, 
+      #{createId,jdbcType=BIGINT}, #{createTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UClassHour">
+        insert into u_class_hour
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="uchid != null">
+                uchid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="eid != null">
+                eid,
+            </if>
+            <if test="surveyTime != null">
+                survey_time,
+            </if>
+            <if test="count != null">
+                count,
+            </if>
+            <if test="dayCount != null">
+                day_count,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="uchid != null">
+                #{uchid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="surveyTime != null">
+                #{surveyTime,jdbcType=DATE},
+            </if>
+            <if test="count != null">
+                #{count,jdbcType=BIGINT},
+            </if>
+            <if test="dayCount != null">
+                #{dayCount,jdbcType=BIGINT},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UClassHour">
+        update u_class_hour
+        <set>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="eid != null">
+                eid = #{eid,jdbcType=BIGINT},
+            </if>
+            <if test="surveyTime != null">
+                survey_time = #{surveyTime,jdbcType=DATE},
+            </if>
+            <if test="count != null">
+                count = #{count,jdbcType=BIGINT},
+            </if>
+            <if test="dayCount != null">
+                day_count = #{dayCount,jdbcType=BIGINT},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where uchid = #{uchid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UClassHour">
+    update u_class_hour
+    set ccid = #{ccid,jdbcType=BIGINT},
+      cid = #{cid,jdbcType=BIGINT},
+       eid = #{eid,jdbcType=BIGINT},
+      survey_time = #{surveyTime,jdbcType=DATE},
+      count = #{count,jdbcType=BIGINT},
+      day_count = #{dayCount,jdbcType=BIGINT},
+      create_id = #{createId,jdbcType=BIGINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where uchid = #{uchid,jdbcType=BIGINT}
+  </update>
+</mapper>

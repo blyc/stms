@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UCheckClassMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UCheckClass">
+        <id column="chid" jdbcType="BIGINT" property="chid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="chdate" jdbcType="DATE" property="chdate"/>
+        <result column="timequantun" jdbcType="VARCHAR" property="timequantun"/>
+        <result column="ccname" jdbcType="VARCHAR" property="ccname"/>
+        <result column="due" jdbcType="BIGINT" property="due"/>
+        <result column="actual" jdbcType="BIGINT" property="actual"/>
+        <result column="attendancerate" jdbcType="DOUBLE" property="attendancerate"/>
+        <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+        <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+        <result column="projector" jdbcType="VARCHAR" property="projector"/>
+        <result column="courseware" jdbcType="VARCHAR" property="courseware"/>
+        <result column="touchscreen" jdbcType="VARCHAR" property="touchscreen"/>
+        <result column="teapro" jdbcType="VARCHAR" property="teapro"/>
+        <result column="teastate" jdbcType="VARCHAR" property="teastate"/>
+        <result column="stustate" jdbcType="VARCHAR" property="stustate"/>
+        <result column="teatourclass" jdbcType="VARCHAR" property="teatourclass"/>
+        <result column="stunum" jdbcType="BIGINT" property="stunum"/>
+        <result column="discipline" jdbcType="VARCHAR" property="discipline"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="beforestate" jdbcType="VARCHAR" property="beforestate"/>
+        <result column="middlestate" jdbcType="VARCHAR" property="middlestate"/>
+        <result column="laterstate" jdbcType="VARCHAR" property="laterstate"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndOther" type="com.hp.common.model.UCheckClass" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    chid, ccid, cid, chdate, timequantun, ccname, due, actual, attendancerate, jsname, bzrname,
+    projector, courseware, touchscreen, teapro, teastate, stustate, teatourclass, stunum,
+    discipline, remark, beforestate, middlestate, laterstate
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid!=null and cid!='' ">
+                and (
+                u1.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+            <if test="ccid!=null and ccid!='' ">
+                and (
+                u1.ccid = #{ccid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMapAndOther">
+        select u1.*, u2.className , u2.companyName,u2.*
+        from u_checkclass u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+        order by u1.chdate desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*)
+        from u_checkclass u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+    </select>
+
+    <insert id="insertCheckClass" parameterType="com.hp.common.model.UCheckClass" keyColumn="chid"
+            keyProperty="chid" useGeneratedKeys="true">
+        insert into u_checkclass
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="chid != null">
+                chid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="chdate != null">
+                chdate,
+            </if>
+            <if test="timequantun != null">
+                timequantun,
+            </if>
+            <if test="ccname != null">
+                ccname,
+            </if>
+            <if test="due != null">
+                due,
+            </if>
+            <if test="actual != null">
+                actual,
+            </if>
+            <if test="attendancerate != null">
+                attendancerate,
+            </if>
+            <if test="jsname != null">
+                jsname,
+            </if>
+            <if test="bzrname != null">
+                bzrname,
+            </if>
+            <if test="projector != null">
+                projector,
+            </if>
+            <if test="courseware != null">
+                courseware,
+            </if>
+            <if test="touchscreen != null">
+                touchscreen,
+            </if>
+            <if test="teapro != null">
+                teapro,
+            </if>
+            <if test="teastate != null">
+                teastate,
+            </if>
+            <if test="stustate != null">
+                stustate,
+            </if>
+            <if test="teatourclass != null">
+                teatourclass,
+            </if>
+            <if test="stunum != null">
+                stunum,
+            </if>
+            <if test="discipline != null">
+                discipline,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="beforestate != null">
+                beforestate,
+            </if>
+            <if test="middlestate != null">
+                middlestate,
+            </if>
+            <if test="laterstate != null">
+                laterstate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="chid != null">
+                #{chid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="chdate != null">
+                #{chdate,jdbcType=DATE},
+            </if>
+            <if test="timequantun != null">
+                #{timequantun,jdbcType=VARCHAR},
+            </if>
+            <if test="ccname != null">
+                #{ccname,jdbcType=VARCHAR},
+            </if>
+            <if test="due != null">
+                #{due,jdbcType=BIGINT},
+            </if>
+            <if test="actual != null">
+                #{actual,jdbcType=BIGINT},
+            </if>
+            <if test="attendancerate != null">
+                #{attendancerate,jdbcType=DOUBLE},
+            </if>
+            <if test="jsname != null">
+                #{jsname,jdbcType=VARCHAR},
+            </if>
+            <if test="bzrname != null">
+                #{bzrname,jdbcType=VARCHAR},
+            </if>
+            <if test="projector != null">
+                #{projector,jdbcType=VARCHAR},
+            </if>
+            <if test="courseware != null">
+                #{courseware,jdbcType=VARCHAR},
+            </if>
+            <if test="touchscreen != null">
+                #{touchscreen,jdbcType=VARCHAR},
+            </if>
+            <if test="teapro != null">
+                #{teapro,jdbcType=VARCHAR},
+            </if>
+            <if test="teastate != null">
+                #{teastate,jdbcType=VARCHAR},
+            </if>
+            <if test="stustate != null">
+                #{stustate,jdbcType=VARCHAR},
+            </if>
+            <if test="teatourclass != null">
+                #{teatourclass,jdbcType=VARCHAR},
+            </if>
+            <if test="stunum != null">
+                #{stunum,jdbcType=BIGINT},
+            </if>
+            <if test="discipline != null">
+                #{discipline,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="beforestate != null">
+                #{beforestate,jdbcType=VARCHAR},
+            </if>
+            <if test="middlestate != null">
+                #{middlestate,jdbcType=VARCHAR},
+            </if>
+            <if test="laterstate != null">
+                #{laterstate,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateUCheckClassByChid" parameterType="com.hp.common.model.UCheckClass">
+        update u_checkclass
+        <set>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="chdate != null">
+                chdate = #{chdate,jdbcType=DATE},
+            </if>
+            <if test="timequantun != null">
+                timequantun = #{timequantun,jdbcType=VARCHAR},
+            </if>
+            <if test="ccname != null">
+                ccname = #{ccname,jdbcType=VARCHAR},
+            </if>
+            <if test="due != null">
+                due = #{due,jdbcType=BIGINT},
+            </if>
+            <if test="actual != null">
+                actual = #{actual,jdbcType=BIGINT},
+            </if>
+            <if test="attendancerate != null">
+                attendancerate = #{attendancerate,jdbcType=DOUBLE},
+            </if>
+            <if test="jsname != null">
+                jsname = #{jsname,jdbcType=VARCHAR},
+            </if>
+            <if test="bzrname != null">
+                bzrname = #{bzrname,jdbcType=VARCHAR},
+            </if>
+            <if test="projector != null">
+                projector = #{projector,jdbcType=VARCHAR},
+            </if>
+            <if test="courseware != null">
+                courseware = #{courseware,jdbcType=VARCHAR},
+            </if>
+            <if test="touchscreen != null">
+                touchscreen = #{touchscreen,jdbcType=VARCHAR},
+            </if>
+            <if test="teapro != null">
+                teapro = #{teapro,jdbcType=VARCHAR},
+            </if>
+            <if test="teastate != null">
+                teastate = #{teastate,jdbcType=VARCHAR},
+            </if>
+            <if test="stustate != null">
+                stustate = #{stustate,jdbcType=VARCHAR},
+            </if>
+            <if test="teatourclass != null">
+                teatourclass = #{teatourclass,jdbcType=VARCHAR},
+            </if>
+            <if test="stunum != null">
+                stunum = #{stunum,jdbcType=BIGINT},
+            </if>
+            <if test="discipline != null">
+                discipline = #{discipline,jdbcType=VARCHAR},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="beforestate != null">
+                beforestate = #{beforestate,jdbcType=VARCHAR},
+            </if>
+            <if test="middlestate != null">
+                middlestate = #{middlestate,jdbcType=VARCHAR},
+            </if>
+            <if test="laterstate != null">
+                laterstate = #{laterstate,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where chid = #{chid,jdbcType=BIGINT}
+    </update>
+
+</mapper>

@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UClassMapper">
+
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UClass">
+        <id column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="num" jdbcType="BIGINT" property="num"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="stage" jdbcType="VARCHAR" property="stage"/>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndAll" type="com.hp.common.model.UClass" extends="BaseResultMap">
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <id column="mid" property="mid" jdbcType="BIGINT"/>
+            <result column="major_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <id column="cid" property="cid" jdbcType="BIGINT"/>
+            <result column="company_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="BaseResultMapAndMajor" type="com.hp.common.model.UClass" extends="BaseResultMap">
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <result column="mname" jdbcType="VARCHAR" property="name"></result>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+     ccid, mid, cid, id, name, num, grade, stage
+  </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")))
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (cid = #{cid,jdbcType=BIGINT})
+            </if>
+            <if test="eid!=null and eid!='' ">
+                and (
+                ccid IN(
+                SELECT cid FROM
+                u_teacher_class
+                WHERE eid=#{eid,jdbcType=BIGINT})
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" parameterType="java.util.Map" resultMap="BaseResultMapAndAll">
+        select uc.* ,um.name as major_name, uco.name as company_name
+        from
+        (select
+        <include refid="Base_Column_List"/>
+        from u_class
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+        ) uc
+        left join u_major um
+        on uc.mid = um.mid
+        left join u_company uco
+        on uc.cid = uco.cid
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(*) from u_class
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findMaxClassNum" resultType="int">
+        SELECT MAX(maxclassnum) maxclassnum FROM(
+            SELECT * FROM(
+              SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(NAME,'-',-1),'班',1) maxclassnum
+              FROM u_class
+              WHERE MID=#{mid,jdbcType=BIGINT} AND cid=#{cid,jdbcType=BIGINT} AND grade=#{grade,jdbcType=VARCHAR} AND state!='删除'
+              ORDER BY SUBSTRING_INDEX(SUBSTRING_INDEX(NAME,'-',-1),'班',1) DESC LIMIT 1
+                         ) a
+            UNION ALL
+            SELECT 0 maxclassnum
+                                                ) b
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMapAndMajor">
+        select
+        uc.*,um.name mname
+        from u_class uc
+        left join u_major um
+        on um.mid=uc.mid
+        where uc.ccid = #{ccid,jdbcType=BIGINT}
+    </select>
+
+    <insert id="insertManyUClass" parameterType="java.util.List">
+        insert into u_class (cid, mid, id,
+        name, num, grade,stage)
+        values
+        <foreach collection="list" item="uclass" index="index" separator=",">
+            (#{uclass.cid,jdbcType=BIGINT}, #{uclass.mid,jdbcType=BIGINT}, #{uclass.id,jdbcType=VARCHAR},
+            #{uclass.name,jdbcType=VARCHAR}, #{uclass.num,jdbcType=BIGINT}, #{uclass.grade,jdbcType=VARCHAR},
+            #{uclass.stage,jdbcType=VARCHAR})
+        </foreach>
+
+    </insert>
+    <resultMap id="resultMap1" type="java.util.HashMap">
+        <result column="mid" property="mid" jdbcType="BIGINT" javaType="java.lang.Long"/>
+        <result column="name" property="majorName" jdbcType="VARCHAR" javaType="java.lang.String"/>
+        <result column="class_count" property="classCount" jdbcType="BIGINT" javaType="java.lang.Long"/>
+    </resultMap>
+
+    <select id="findMajorClassCountByParam" parameterType="java.util.Map" resultMap="resultMap1">
+        SELECT u1.mid,u1.name,u2.class_count
+        FROM u_major u1
+        LEFT JOIN(
+        SELECT MID,COUNT(*) AS class_count
+        FROM u_class
+        <where>
+            <if test="grade != null and grade !='' ">
+                AND (grade=#{grade,jdbcType=VARCHAR})
+            </if>
+            <if test="cid != null and cid !='' ">
+                AND (cid =#{cid,jdbcType=BIGINT})
+            </if>
+            and (state != '删除')
+        </where>
+        GROUP BY mid
+        ) u2
+        ON u1.mid = u2.mid
+        ORDER BY u1.mid ASC
+    </select>
+
+    <select id="findByCidAndMidAndGrade" parameterType="com.hp.common.model.UClass" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class
+        <where>
+            <if test="cid!=null and cid!=''">
+                and cid = #{cid,jdbcType=BIGINT}
+            </if>
+            <if test="grade!=null and grade!=''">
+                and grade = #{grade,jdbcType=VARCHAR}
+            </if>
+            <if test="mid!=null and mid!=''">
+                and mid = #{mid,jdbcType=BIGINT}
+            </if>
+        </where>
+    </select>
+
+    <!--<select id="findUClassByParam" parameterType="java.util.Map" resultMap="BaseResultMap">-->
+    <!--select-->
+    <!--<include refid="Base_Column_List"/>-->
+    <!--from u_class-->
+    <!--<where>-->
+    <!--&lt;!&ndash; 根据校区 &ndash;&gt;-->
+    <!--<if test="cid!=null and cid!=''">-->
+    <!--and cid = #{cid,jdbcType=BIGINT}-->
+    <!--</if>-->
+    <!--&lt;!&ndash; 根据年级 &ndash;&gt;-->
+    <!--<if test="grade!=null and grade!=''">-->
+    <!--and grade = #{grade,jdbcType=VARCHAR}-->
+    <!--</if>-->
+    <!--&lt;!&ndash; 根据专业 &ndash;&gt;-->
+    <!--<if test="mid!=null and mid!=''">-->
+    <!--and mid = #{mid,jdbcType=BIGINT}-->
+    <!--</if>-->
+
+    <!--&lt;!&ndash;未登记出勤&ndash;&gt;-->
+    <!--<if test="attendRecordTime!=null and attendRecordTime!=''">-->
+    <!--and ccid not in(-->
+    <!--SELECT ccid-->
+    <!--FROM u_class_attendance-->
+    <!--WHERE record_time =#{attendRecordTime,jdbcType=BIGINT}-->
+    <!--)-->
+    <!--</if>-->
+
+    <!--</where>-->
+    <!--</select>-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UClass">
+        update u_class
+        <set>
+            <if test="mid != null">
+                mid = #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="num != null">
+                num = #{num,jdbcType=BIGINT},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="stage != null">
+                stage = #{stage,jdbcType=VARCHAR},
+            </if>
+            <if test="state != null">
+                state = #{state,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ccid = #{ccid,jdbcType=BIGINT}
+    </update>
+
+    <update id="updateNumByPrimayKey" parameterType="com.hp.common.model.UClass">
+        update u_class
+        set num = num + #{num,jdbcType=BIGINT}
+        where ccid = #{ccid,jdbcType=BIGINT}
+    </update>
+
+    <select id="selectALLUClassname" resultMap="BaseResultMap">
+    select cid, name ,num from u_class
+    </select>
+
+    <select id="selectALLUClassnum" parameterType="com.hp.common.model.UClass" resultMap="BaseResultMap">
+        select cid, name ,num from u_class
+        WHERE name = #{name}
+    </select>
+
+    <select id="findUClass" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class
+        <if test="cid != null and cid !='' ">
+            where cid = #{cid,jdbcType=BIGINT}
+        </if>
+    </select>
+
+    <select id="findUClassByCid" resultMap="BaseResultMap" parameterType="java.util.Map">
+        select
+        <include refid="Base_Column_List"/>
+        from u_class
+        <if test="cid != null and cid !='' ">
+            where cid = #{cid,jdbcType=BIGINT}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UMajorMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UMajor">
+        <id column="mid" property="mid" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="ResultMapForFindAllWithNum" type="com.hp.common.model.UMajor">
+        <id column="mid" property="mid" jdbcType="BIGINT"/>
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="num" property="num" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    mid, id, name
+   </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(id) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_major
+        <include refid="where_all"/>
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findAllWithNum" resultMap="ResultMapForFindAllWithNum">
+        SELECT
+        u_major.mid,u_major.id,u_major.name,COUNT(u_student.mid) num
+        FROM u_major LEFT JOIN (SELECT * FROM u_student WHERE state != "删除") u_student
+        ON u_major.mid = u_student.mid
+        <include refid="where_all"/>
+        GROUP BY MID
+        ORDER BY MID
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        select count(mid) from u_major
+        <include refid="where_all"/>
+    </select>
+
+    <select id="findAllMajor" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_major
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from u_major
+        where mid=#{mid}
+    </select>
+
+    <select id="findByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from u_major
+        where name = #{name}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="mid" parameterType="com.hp.common.model.UMajor">
+      insert into u_major(mid, id, name)
+      values(#{mid,jdbcType=BIGINT},#{id,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UMajor">
+        update u_major
+        <set>
+            <if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where mid=#{mid,jdbcType=BIGINT}
+    </update>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+      delete from u_major
+      where mid = #{mid,jdbcType=BIGINT}
+    </delete>
+</mapper>

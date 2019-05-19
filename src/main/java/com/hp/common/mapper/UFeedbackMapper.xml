@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UFeedbackMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UFeedback">
+    <id column="Fid" jdbcType="BIGINT" property="fid" />
+    <result column="Fname" jdbcType="VARCHAR" property="fname" />
+    <result column="FNumber" jdbcType="BIGINT" property="fnumber" />
+    <result column="Fdate" jdbcType="DATE" property="fdate" />
+    <result column="grantdate" jdbcType="DATE" property="grantdate" />
+    <result column="edition" jdbcType="VARCHAR" property="edition" />
+    <result column="aid" jdbcType="BIGINT" property="aid" />
+  </resultMap>
+
+  <resultMap id="UCompany" type="com.hp.common.model.UCompany">
+    <id column="cid" property="cid" jdbcType="BIGINT"/>
+    <result column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="address" property="address" jdbcType="VARCHAR"/>
+    <result column="tel" property="tel" jdbcType="VARCHAR"/>
+    <result column="describtion" property="describtion" jdbcType="VARCHAR"/>
+    <result column="founded" property="founded" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <resultMap id="uMajor" type="com.hp.common.model.UMajor">
+    <id column="mid" jdbcType="BIGINT" property="mid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    Fid, fname, FNumber, Fdate, grantdate, edition,aid
+  </sql>
+
+  <select id="findAll"  resultMap="BaseResultMap">
+   select
+    <include refid="Base_Column_List"/>
+    from u_feedback ORDER BY grantdate DESC
+  </select>
+
+  <select id="findCount" resultMap="BaseResultMap">
+    select count(fid) from u_feedback
+  </select>
+
+  <insert id="insertSelective" parameterType="com.hp.common.model.UFeedback">
+    insert into u_feedback
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fid != null">
+        Fid,
+      </if>
+      <if test="aid != null">
+        aid,
+      </if>
+      <if test="fname != null">
+        fname,
+      </if>
+      <if test="fnumber != null">
+        FNumber,
+      </if>
+      <if test="fdate != null">
+        Fdate,
+      </if>
+      <if test="grantdate != null">
+        grantdate,
+      </if>
+      <if test="edition != null">
+        edition,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fid != null">
+        #{fid,jdbcType=BIGINT},
+      </if>
+      <if test="aid != null">
+        #{aid,jdbcType=BIGINT},
+      </if>
+      <if test="fname != null">
+        #{fname,jdbcType=VARCHAR},
+      </if>
+      <if test="fnumber != null">
+        #{fnumber,jdbcType=BIGINT},
+      </if>
+      <if test="fdate != null">
+        #{fdate,jdbcType=DATE},
+      </if>
+      <if test="grantdate != null">
+        #{grantdate,jdbcType=DATE},
+      </if>
+      <if test="edition != null">
+        #{edition,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+
+  <select id="selectUFeedbackANdaid" parameterType="com.hp.common.model.UFeedback" resultMap="BaseResultMap">
+    SELECT
+*
+    FROM u_feedback WHERE aid = #{aid}
+  </select>
+
+</mapper>

@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UStandardMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UStandard">
+        <id column="sid" jdbcType="BIGINT" property="sid"/>
+        <result column="weight_exam" jdbcType="BIGINT" property="weightExam"/>
+        <result column="standard_exam" jdbcType="DECIMAL" property="standardExam"/>
+        <result column="low_stanndard_exam" jdbcType="DECIMAL" property="lowStanndardExam"/>
+        <result column="weight_project" jdbcType="BIGINT" property="weightProject"/>
+        <result column="standard_project" jdbcType="DECIMAL" property="standardProject"/>
+        <result column="low_standard_project" jdbcType="DECIMAL" property="lowStandardProject"/>
+        <result column="weight_satisfaction" jdbcType="BIGINT" property="weightSatisfaction"/>
+        <result column="standard_satisfaction" jdbcType="DECIMAL" property="standardSatisfaction"/>
+        <result column="low_standard_satisfaction" jdbcType="DECIMAL" property="lowStandardSatisfaction"/>
+        <result column="weight_attendance" jdbcType="BIGINT" property="weightAttendance"/>
+        <result column="standard_attendance" jdbcType="DECIMAL" property="standardAttendance"/>
+        <result column="low_standard_attendance" jdbcType="DECIMAL" property="lowStandardAttendance"/>
+        <result column="weight_school" jdbcType="BIGINT" property="weightSchool"/>
+        <result column="standard_school" jdbcType="DECIMAL" property="standardSchool"/>
+        <result column="low_standard_school" jdbcType="DECIMAL" property="lowStandardSchool"/>
+        <result column="weight_head" jdbcType="BIGINT" property="weightHead"/>
+        <result column="standard_head" jdbcType="DECIMAL" property="standardHead"/>
+        <result column="low_standard_head" jdbcType="DECIMAL" property="lowStandardHead"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="mid" jdbcType="BIGINT" property="mid"/>
+        <result column="majorType" jdbcType="VARCHAR" property="majorType"/>
+        <result column="scope" jdbcType="VARCHAR" property="scope"/>
+        <result column="result" jdbcType="DECIMAL" property="result"/>
+        <result column="base" jdbcType="DECIMAL" property="base"/>
+        <result column="grade" jdbcType="VARCHAR" property="grade"/>
+        <result column="standard_time" jdbcType="VARCHAR" property="standardTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="create_id" jdbcType="BIGINT" property="createId"/>
+        <association property="uMajor" javaType="com.hp.common.model.UMajor">
+            <id column="mid" property="mid" jdbcType="BIGINT"/>
+            <result column="umajor_name" property="name" jdbcType="VARCHAR"/>
+            <result column="id" property="id" jdbcType="VARCHAR"/>
+        </association>
+        <association property="uCompany" javaType="com.hp.common.model.UCompany">
+            <result column="company_name" property="name" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+    sid, weight_exam, standard_exam, low_stanndard_exam, weight_project, standard_project,
+    low_standard_project, weight_satisfaction, standard_satisfaction, low_standard_satisfaction,
+    weight_attendance, standard_attendance, low_standard_attendance, weight_school, standard_school,
+    low_standard_school, weight_head, standard_head, low_standard_head, cid, mid, majorType, scope, result,
+    base, grade, standard_time, create_time, create_id
+  </sql>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(us.grade) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(us.majorType) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(um.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="queryDate!=null and queryDate!='' ">
+                and (
+                us.standard_time = #{queryDate,jdbcType=VARCHAR}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <select id="findAll" resultMap="BaseResultMap">
+        SELECT
+        us.*, um.name as umajor_name,uc.name as company_name
+        FROM u_standard us
+        LEFT JOIN u_major um
+        ON us.mid = um.mid
+        LEFT JOIN u_company uc
+        on us.cid = uc.cid
+        <include refid="where_all"/>
+        order by us.create_time desc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        SELECT count(*)
+        FROM u_standard us
+        LEFT JOIN u_major um
+        ON us.mid = um.mid
+        LEFT JOIN u_company uc
+        on us.cid = uc.cid
+        <include refid="where_all"/>
+    </select>
+
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+          SELECT
+        us.*, um.name as umajor_name
+        FROM u_standard us
+        LEFT JOIN u_major um
+        ON us.mid = um.mid
+        where us.sid = #{sid,jdbcType=BIGINT}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete from u_standard
+        where sid = #{sid,jdbcType=BIGINT}
+    </delete>
+
+    <insert id="insert" parameterType="com.hp.common.model.UStandard">
+        insert into u_standard (sid, weight_exam, standard_exam,
+        low_stanndard_exam, weight_project, standard_project,
+        low_standard_project, weight_satisfaction,
+        standard_satisfaction, low_standard_satisfaction,
+        weight_attendance, standard_attendance, low_standard_attendance,
+        weight_school, standard_school, low_standard_school,
+        weight_head, standard_head, low_standard_head,cid,
+        mid, majorType, scope, result,
+        base, grade, standard_time,
+        create_time, create_id)
+        values (#{sid,jdbcType=BIGINT}, #{weightExam,jdbcType=BIGINT}, #{standardExam,jdbcType=DECIMAL},
+        #{lowStanndardExam,jdbcType=DECIMAL}, #{weightProject,jdbcType=BIGINT}, #{standardProject,jdbcType=DECIMAL},
+        #{lowStandardProject,jdbcType=DECIMAL}, #{weightSatisfaction,jdbcType=BIGINT},
+        #{standardSatisfaction,jdbcType=DECIMAL}, #{lowStandardSatisfaction,jdbcType=DECIMAL},
+        #{weightAttendance,jdbcType=BIGINT}, #{standardAttendance,jdbcType=DECIMAL}, #{lowStandardAttendance,jdbcType=DECIMAL},
+        #{weightSchool,jdbcType=BIGINT}, #{standardSchool,jdbcType=DECIMAL}, #{lowStandardSchool,jdbcType=DECIMAL},
+        #{weightHead,jdbcType=BIGINT}, #{standardHead,jdbcType=DECIMAL}, #{lowStandardHead,jdbcType=DECIMAL},#{cid,jdbcType=BIGINT},
+        #{mid,jdbcType=BIGINT},  #{majorType,jdbcType=VARCHAR},#{scope,jdbcType=VARCHAR}, #{result,jdbcType=DECIMAL},
+        #{base,jdbcType=DECIMAL}, #{grade,jdbcType=VARCHAR}, #{standardTime,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{createId,jdbcType=BIGINT})
+    </insert>
+
+    <insert id="insertSelective" parameterType="com.hp.common.model.UStandard">
+        insert into u_standard
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sid != null">
+                sid,
+            </if>
+            <if test="weightExam != null">
+                weight_exam,
+            </if>
+            <if test="standardExam != null">
+                standard_exam,
+            </if>
+            <if test="lowStanndardExam != null">
+                low_stanndard_exam,
+            </if>
+            <if test="weightProject != null">
+                weight_project,
+            </if>
+            <if test="standardProject != null">
+                standard_project,
+            </if>
+            <if test="lowStandardProject != null">
+                low_standard_project,
+            </if>
+            <if test="weightSatisfaction != null">
+                weight_satisfaction,
+            </if>
+            <if test="standardSatisfaction != null">
+                standard_satisfaction,
+            </if>
+            <if test="lowStandardSatisfaction != null">
+                low_standard_satisfaction,
+            </if>
+            <if test="weightAttendance != null">
+                weight_attendance,
+            </if>
+            <if test="standardAttendance != null">
+                standard_attendance,
+            </if>
+            <if test="lowStandardAttendance != null">
+                low_standard_attendance,
+            </if>
+            <if test="weightSchool != null">
+                weight_school,
+            </if>
+            <if test="standardSchool != null">
+                standard_school,
+            </if>
+            <if test="lowStandardSchool != null">
+                low_standard_school,
+            </if>
+            <if test="weightHead != null">
+                weight_head,
+            </if>
+            <if test="standardHead != null">
+                standard_head,
+            </if>
+            <if test="lowStandardHead != null">
+                low_standard_head,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="mid != null">
+                mid,
+            </if>
+            <if test="majorType != null">
+                majorType,
+            </if>
+            <if test="scope != null">
+                scope,
+            </if>
+            <if test="result != null">
+                result,
+            </if>
+            <if test="base != null">
+                base,
+            </if>
+            <if test="grade != null">
+                grade,
+            </if>
+            <if test="standardTime != null">
+                standard_time,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="createId != null">
+                create_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sid != null">
+                #{sid,jdbcType=BIGINT},
+            </if>
+            <if test="weightExam != null">
+                #{weightExam,jdbcType=BIGINT},
+            </if>
+            <if test="standardExam != null">
+                #{standardExam,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStanndardExam != null">
+                #{lowStanndardExam,jdbcType=DECIMAL},
+            </if>
+            <if test="weightProject != null">
+                #{weightProject,jdbcType=BIGINT},
+            </if>
+            <if test="standardProject != null">
+                #{standardProject,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardProject != null">
+                #{lowStandardProject,jdbcType=DECIMAL},
+            </if>
+            <if test="weightSatisfaction != null">
+                #{weightSatisfaction,jdbcType=BIGINT},
+            </if>
+            <if test="standardSatisfaction != null">
+                #{standardSatisfaction,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardSatisfaction != null">
+                #{lowStandardSatisfaction,jdbcType=DECIMAL},
+            </if>
+            <if test="weightAttendance != null">
+                #{weightAttendance,jdbcType=BIGINT},
+            </if>
+            <if test="standardAttendance != null">
+                #{standardAttendance,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardAttendance != null">
+                #{lowStandardAttendance,jdbcType=DECIMAL},
+            </if>
+            <if test="weightSchool != null">
+                #{weightSchool,jdbcType=BIGINT},
+            </if>
+            <if test="standardSchool != null">
+                #{standardSchool,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardSchool != null">
+                #{lowStandardSchool,jdbcType=DECIMAL},
+            </if>
+            <if test="weightHead != null">
+                #{weightHead,jdbcType=BIGINT},
+            </if>
+            <if test="standardHead != null">
+                #{standardHead,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardHead != null">
+                #{lowStandardHead,jdbcType=DECIMAL},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="mid != null">
+                #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="majorType != null">
+                #{majorType,jdbcType=VARCHAR},
+            </if>
+            <if test="scope != null">
+                #{scope,jdbcType=VARCHAR},
+            </if>
+            <if test="result != null">
+                #{result,jdbcType=DECIMAL},
+            </if>
+            <if test="base != null">
+                #{base,jdbcType=DECIMAL},
+            </if>
+            <if test="grade != null">
+                #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="standardTime != null">
+                #{standardTime,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                #{createId,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UStandard">
+        update u_standard
+        <set>
+            <if test="weightExam != null">
+                weight_exam = #{weightExam,jdbcType=BIGINT},
+            </if>
+            <if test="standardExam != null">
+                standard_exam = #{standardExam,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStanndardExam != null">
+                low_stanndard_exam = #{lowStanndardExam,jdbcType=DECIMAL},
+            </if>
+            <if test="weightProject != null">
+                weight_project = #{weightProject,jdbcType=BIGINT},
+            </if>
+            <if test="standardProject != null">
+                standard_project = #{standardProject,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardProject != null">
+                low_standard_project = #{lowStandardProject,jdbcType=DECIMAL},
+            </if>
+            <if test="weightSatisfaction != null">
+                weight_satisfaction = #{weightSatisfaction,jdbcType=BIGINT},
+            </if>
+            <if test="standardSatisfaction != null">
+                standard_satisfaction = #{standardSatisfaction,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardSatisfaction != null">
+                low_standard_satisfaction = #{lowStandardSatisfaction,jdbcType=DECIMAL},
+            </if>
+            <if test="weightAttendance != null">
+                weight_attendance = #{weightAttendance,jdbcType=BIGINT},
+            </if>
+            <if test="standardAttendance != null">
+                standard_attendance = #{standardAttendance,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardAttendance != null">
+                low_standard_attendance = #{lowStandardAttendance,jdbcType=DECIMAL},
+            </if>
+            <if test="weightSchool != null">
+                weight_school = #{weightSchool,jdbcType=BIGINT},
+            </if>
+            <if test="standardSchool != null">
+                standard_school = #{standardSchool,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardSchool != null">
+                low_standard_school = #{lowStandardSchool,jdbcType=DECIMAL},
+            </if>
+            <if test="weightHead != null">
+                weight_head = #{weightHead,jdbcType=BIGINT},
+            </if>
+            <if test="standardHead != null">
+                standard_head = #{standardHead,jdbcType=DECIMAL},
+            </if>
+            <if test="lowStandardHead != null">
+                low_standard_head = #{lowStandardHead,jdbcType=DECIMAL},
+            </if>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="mid != null">
+                mid = #{mid,jdbcType=BIGINT},
+            </if>
+            <if test="majorType != null">
+                #{majorType,jdbcType=VARCHAR},
+            </if>
+            <if test="scope != null">
+                scope = #{scope,jdbcType=VARCHAR},
+            </if>
+            <if test="result != null">
+                result = #{result,jdbcType=DECIMAL},
+            </if>
+            <if test="base != null">
+                base = #{base,jdbcType=DECIMAL},
+            </if>
+            <if test="grade != null">
+                grade = #{grade,jdbcType=VARCHAR},
+            </if>
+            <if test="standardTime != null">
+                standard_time = #{standardTime,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createId != null">
+                create_id = #{createId,jdbcType=BIGINT},
+            </if>
+        </set>
+        where sid = #{sid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UStandard">
+    update u_standard
+    set weight_exam = #{weightExam,jdbcType=BIGINT},
+      standard_exam = #{standardExam,jdbcType=DECIMAL},
+      low_stanndard_exam = #{lowStanndardExam,jdbcType=DECIMAL},
+      weight_project = #{weightProject,jdbcType=BIGINT},
+      standard_project = #{standardProject,jdbcType=DECIMAL},
+      low_standard_project = #{lowStandardProject,jdbcType=DECIMAL},
+      weight_satisfaction = #{weightSatisfaction,jdbcType=BIGINT},
+      standard_satisfaction = #{standardSatisfaction,jdbcType=DECIMAL},
+      low_standard_satisfaction = #{lowStandardSatisfaction,jdbcType=DECIMAL},
+      weight_attendance = #{weightAttendance,jdbcType=BIGINT},
+      standard_attendance = #{standardAttendance,jdbcType=DECIMAL},
+      low_standard_attendance = #{lowStandardAttendance,jdbcType=DECIMAL},
+      weight_school = #{weightSchool,jdbcType=BIGINT},
+      standard_school = #{standardSchool,jdbcType=DECIMAL},
+      low_standard_school = #{lowStandardSchool,jdbcType=DECIMAL},
+      weight_head = #{weightHead,jdbcType=BIGINT},
+      standard_head = #{standardHead,jdbcType=DECIMAL},
+      low_standard_head = #{lowStandardHead,jdbcType=DECIMAL},
+      cid = #{cid,jdbcType=BIGINT},
+      mid = #{mid,jdbcType=BIGINT},
+      majorType = #{majorType,jdbcType=VARCHAR},
+      scope = #{scope,jdbcType=VARCHAR},
+      result = #{result,jdbcType=DECIMAL},
+      base = #{base,jdbcType=DECIMAL},
+      grade = #{grade,jdbcType=VARCHAR},
+      standard_time = #{standardTime,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      create_id = #{createId,jdbcType=BIGINT}
+    where sid = #{sid,jdbcType=BIGINT}
+  </update>
+    <select id="selectIsRepetition" resultMap="BaseResultMap">
+     SELECT *
+        FROM u_standard u
+        WHERE u.standard_time=#{standardTime,jdbcType=VARCHAR}
+        AND u.grade=#{grade,jdbcType=VARCHAR}
+        AND u.mid=#{mid,jdbcType=BIGINT}
+        AND u.cid=#{cid,jdbcType=BIGINT}
+    </select>
+</mapper>

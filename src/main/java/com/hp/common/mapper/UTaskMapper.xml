@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UTaskMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UTask">
+        <id column="tid" jdbcType="BIGINT" property="tid"/>
+        <result column="cid" jdbcType="BIGINT" property="cid"/>
+        <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+        <result column="tasknum" jdbcType="BIGINT" property="tasknum"/>
+        <result column="uid" jdbcType="BIGINT" property="uid"/>
+        <result column="mark" jdbcType="BIGINT" property="mark"/>
+        <result column="arrangementtime" jdbcType="TIMESTAMP" property="arrangementtime"/>
+        <result column="tasktype" jdbcType="VARCHAR" property="tasktype"/>
+        <result column="taskproject" jdbcType="VARCHAR" property="taskproject"/>
+        <result column="homework" jdbcType="VARCHAR" property="homework"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    tid, cid, ccid, tasknum, uid, mark, arrangementtime, tasktype, taskproject, homework
+  </sql>
+
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_task
+        where tid = #{tid,jdbcType=BIGINT}
+    </select>
+
+    <sql id="where_all">
+        <where>
+            <if test="findContent != null and findContent !='' ">
+                and (
+                LOWER(u2.companyName) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.className) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.bzrname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.jsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")) or
+                LOWER(u2.dsname) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%"))
+                )
+            </if>
+            <if test="cid != null and cid !='' ">
+                and (
+                u1.cid = #{cid,jdbcType=BIGINT}
+                )
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_sql">
+        <if test="page_sql != null and page_sql != ''">
+            ${page_sql}
+        </if>
+    </sql>
+
+    <resultMap id="BaseResultMapAndCompany" type="com.hp.common.model.UTask" extends="BaseResultMap">
+        <association property="vClass" javaType="com.hp.common.model.VClass">
+            <result column="cid" jdbcType="BIGINT" property="cid"/>
+            <result column="ccid" jdbcType="BIGINT" property="ccid"/>
+            <result column="className" jdbcType="VARCHAR" property="classname"/>
+            <result column="mid" jdbcType="BIGINT" property="mid"/>
+            <result column="num" jdbcType="BIGINT" property="num"/>
+            <result column="grade" jdbcType="VARCHAR" property="grade"/>
+            <result column="companyName" jdbcType="VARCHAR" property="companyname"/>
+            <result column="majorName" jdbcType="VARCHAR" property="majorname"/>
+            <result column="jseid" jdbcType="BIGINT" property="jseid"/>
+            <result column="jsname" jdbcType="VARCHAR" property="jsname"/>
+            <result column="dseid" jdbcType="BIGINT" property="dseid"/>
+            <result column="dsname" jdbcType="VARCHAR" property="dsname"/>
+            <result column="bzreid" jdbcType="BIGINT" property="bzreid"/>
+            <result column="bzrname" jdbcType="VARCHAR" property="bzrname"/>
+            <result column="stage" jdbcType="VARCHAR" property="stage"/>
+        </association>
+    </resultMap>
+
+    <select id="findAll" resultMap="BaseResultMapAndCompany">
+        SELECT u1.*,u2.*
+        FROM u_task u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+        order by u1.arrangementtime desc, u2.cid asc , u2.grade desc ,u2.mid asc
+        <include refid="limit_sql"/>
+    </select>
+
+    <select id="findCount" resultMap="BaseResultMap">
+        SELECT count(*)
+        FROM u_task u1
+        LEFT JOIN v_class u2
+        ON u1.ccid=u2.ccid
+        <include refid="where_all"/>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_task
+    where tid = #{tid,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UTask">
+    insert into u_task (tid, cid, ccid, 
+      tasknum, uid, mark, arrangementtime, 
+      tasktype, taskproject, homework
+      )
+    values (#{tid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT}, 
+      #{tasknum,jdbcType=BIGINT}, #{uid,jdbcType=BIGINT}, #{mark,jdbcType=BIGINT}, #{arrangementtime,jdbcType=TIMESTAMP}, 
+      #{tasktype,jdbcType=VARCHAR}, #{taskproject,jdbcType=VARCHAR}, #{homework,jdbcType=VARCHAR}
+      )
+  </insert>
+
+    <insert id="insertUtask" parameterType="com.hp.common.model.UTask" keyColumn="tid" keyProperty="tid"
+            useGeneratedKeys="true">
+    insert into u_task (tid, cid, ccid,
+    tasknum, uid, mark, arrangementtime,
+    tasktype, taskproject, homework
+    )
+    values (#{tid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{ccid,jdbcType=BIGINT},
+    #{tasknum,jdbcType=BIGINT}, #{uid,jdbcType=BIGINT}, #{mark,jdbcType=BIGINT}, #{arrangementtime,jdbcType=TIMESTAMP},
+    #{tasktype,jdbcType=VARCHAR}, #{taskproject,jdbcType=VARCHAR}, #{homework,jdbcType=VARCHAR}
+    )
+  </insert>
+
+    <insert id="insertSelective" parameterType="com.hp.common.model.UTask">
+        insert into u_task
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tid != null">
+                tid,
+            </if>
+            <if test="cid != null">
+                cid,
+            </if>
+            <if test="ccid != null">
+                ccid,
+            </if>
+            <if test="tasknum != null">
+                tasknum,
+            </if>
+            <if test="uid != null">
+                uid,
+            </if>
+            <if test="mark != null">
+                mark,
+            </if>
+            <if test="arrangementtime != null">
+                arrangementtime,
+            </if>
+            <if test="tasktype != null">
+                tasktype,
+            </if>
+            <if test="taskproject != null">
+                taskproject,
+            </if>
+            <if test="homework != null">
+                homework,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tid != null">
+                #{tid,jdbcType=BIGINT},
+            </if>
+            <if test="cid != null">
+                #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="tasknum != null">
+                #{tasknum,jdbcType=BIGINT},
+            </if>
+            <if test="uid != null">
+                #{uid,jdbcType=BIGINT},
+            </if>
+            <if test="mark != null">
+                #{mark,jdbcType=BIGINT},
+            </if>
+            <if test="arrangementtime != null">
+                #{arrangementtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tasktype != null">
+                #{tasktype,jdbcType=VARCHAR},
+            </if>
+            <if test="taskproject != null">
+                #{taskproject,jdbcType=VARCHAR},
+            </if>
+            <if test="homework != null">
+                #{homework,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UTask">
+        update u_task
+        <set>
+            <if test="cid != null">
+                cid = #{cid,jdbcType=BIGINT},
+            </if>
+            <if test="ccid != null">
+                ccid = #{ccid,jdbcType=BIGINT},
+            </if>
+            <if test="tasknum != null">
+                tasknum = #{tasknum,jdbcType=BIGINT},
+            </if>
+            <if test="uid != null">
+                uid = #{uid,jdbcType=BIGINT},
+            </if>
+            <if test="mark != null">
+                mark = #{mark,jdbcType=BIGINT},
+            </if>
+            <if test="arrangementtime != null">
+                arrangementtime = #{arrangementtime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="tasktype != null">
+                tasktype = #{tasktype,jdbcType=VARCHAR},
+            </if>
+            <if test="taskproject != null">
+                taskproject = #{taskproject,jdbcType=VARCHAR},
+            </if>
+            <if test="homework != null">
+                homework = #{homework,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where tid = #{tid,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UTask">
+    update u_task
+    set cid = #{cid,jdbcType=BIGINT},
+      ccid = #{ccid,jdbcType=BIGINT},
+      tasknum = #{tasknum,jdbcType=BIGINT},
+      uid = #{uid,jdbcType=BIGINT},
+      mark = #{mark,jdbcType=BIGINT},
+      arrangementtime = #{arrangementtime,jdbcType=TIMESTAMP},
+      tasktype = #{tasktype,jdbcType=VARCHAR},
+      taskproject = #{taskproject,jdbcType=VARCHAR},
+      homework = #{homework,jdbcType=VARCHAR}
+    where tid = #{tid,jdbcType=BIGINT}
+  </update>
+
+    <update id="updateMarkByPrimaryKey" parameterType="com.hp.common.model.UTask">
+    update u_task SET
+    mark = 1
+    where tid = #{tid,jdbcType=BIGINT}
+  </update>
+</mapper>

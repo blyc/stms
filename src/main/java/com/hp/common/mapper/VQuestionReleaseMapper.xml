@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.VQuestionReleaseMapper">
+
+  <resultMap id="BaseResultMap" type="com.hp.common.model.VQuestionRelease">
+    <result column="qbid" jdbcType="BIGINT" property="qbid" />
+    <result column="imgname" jdbcType="VARCHAR" property="imgname" />
+    <result column="qbid" jdbcType="BIGINT" property="mid" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="qrid" jdbcType="BIGINT" property="qrid" />
+    <result column="ccid" jdbcType="BIGINT" property="ccid" />
+    <result column="ccname" jdbcType="VARCHAR" property="ccname" />
+    <result column="cid" jdbcType="BIGINT" property="cid" />
+    <result column="cname" jdbcType="VARCHAR" property="cname" />
+    <result column="eid" jdbcType="BIGINT" property="eid" />
+    <result column="ename" jdbcType="VARCHAR" property="ename" />
+    <result column="failureTime" jdbcType="TIMESTAMP" property="failureTime" />
+    <result column="foldername" jdbcType="VARCHAR" property="foldername" />
+    <result column="key" jdbcType="VARCHAR" property="key" />
+    <result column="state" jdbcType="VARCHAR" property="state" />
+  </resultMap>
+
+  <sql id="Base_Column_List">
+    vqr.qbid, vqr.imgname, vqr.mid, vqr.name, vqr.qrid, vqr.ccid, vqr.ccname, vqr.cid, vqr.cname, vqr.eid, vqr.ename, vqr.failureTime, vqr.foldername, vqr.key, vqr.state, vqr.sumbitted
+  </sql>
+
+  <sql id="limit_sql">
+    <if test="page_sql != null and page_sql != ''">
+      ${page_sql}
+    </if>
+  </sql>
+
+  <sql id="where_all">
+    <where>
+      <if test="findContent != null and findContent !='' ">
+        and (LOWER(vqr.name) like LOWER(CONCAT("%",#{findContent,jdbcType=VARCHAR},"%")))
+      </if>
+      <if test="cid!=null and cid!=''">
+        and (cid = #{cid,jdbcType=BIGINT})
+      </if>
+    </where>
+  </sql>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"/>
+    from v_question_release vqr
+    <include refid="where_all"/>
+    order by state desc,failureTime asc,qbid asc
+    <include refid="limit_sql"/>
+  </select>
+  <select id="findCount" resultMap="BaseResultMap">
+    select count(*) from v_question_release vqr
+    <include refid="where_all"/>
+  </select>
+
+  <select id="findAllQuestionRelease" resultMap="BaseResultMap" parameterType="java.util.Map">
+    select
+    <include refid="Base_Column_List"/>
+    from v_question_release
+    <where>
+      <if test="name != null and name !='' ">
+        and (name = #{name,jdbcType=VARCHAR})
+      </if>
+    </where>
+  </select>
+</mapper>

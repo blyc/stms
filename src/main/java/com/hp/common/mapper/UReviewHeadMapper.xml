@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UReviewHeadMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UReviewHead">
+    <id column="urhid" jdbcType="BIGINT" property="urhid" />
+    <result column="cid" jdbcType="BIGINT" property="cid" />
+    <result column="eid" jdbcType="BIGINT" property="eid" />
+    <result column="review_time" jdbcType="DATE" property="reviewTime" />
+    <result column="qualified" jdbcType="DECIMAL" property="qualified" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    urhid, cid, eid, review_time, qualified
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from u_review_head
+    where urhid = #{urhid,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_review_head
+    where urhid = #{urhid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.hp.common.model.UReviewHead">
+    insert into u_review_head (urhid, cid, eid, 
+      review_time, qualified)
+    values (#{urhid,jdbcType=BIGINT}, #{cid,jdbcType=BIGINT}, #{eid,jdbcType=BIGINT}, 
+      #{reviewTime,jdbcType=DATE}, #{qualified,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hp.common.model.UReviewHead">
+    insert into u_review_head
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="urhid != null">
+        urhid,
+      </if>
+      <if test="cid != null">
+        cid,
+      </if>
+      <if test="eid != null">
+        eid,
+      </if>
+      <if test="reviewTime != null">
+        review_time,
+      </if>
+      <if test="qualified != null">
+        qualified,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="urhid != null">
+        #{urhid,jdbcType=BIGINT},
+      </if>
+      <if test="cid != null">
+        #{cid,jdbcType=BIGINT},
+      </if>
+      <if test="eid != null">
+        #{eid,jdbcType=BIGINT},
+      </if>
+      <if test="reviewTime != null">
+        #{reviewTime,jdbcType=DATE},
+      </if>
+      <if test="qualified != null">
+        #{qualified,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UReviewHead">
+    update u_review_head
+    <set>
+      <if test="cid != null">
+        cid = #{cid,jdbcType=BIGINT},
+      </if>
+      <if test="eid != null">
+        eid = #{eid,jdbcType=BIGINT},
+      </if>
+      <if test="reviewTime != null">
+        review_time = #{reviewTime,jdbcType=DATE},
+      </if>
+      <if test="qualified != null">
+        qualified = #{qualified,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where urhid = #{urhid,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UReviewHead">
+    update u_review_head
+    set cid = #{cid,jdbcType=BIGINT},
+      eid = #{eid,jdbcType=BIGINT},
+      review_time = #{reviewTime,jdbcType=DATE},
+      qualified = #{qualified,jdbcType=DECIMAL}
+    where urhid = #{urhid,jdbcType=BIGINT}
+  </update>
+</mapper>

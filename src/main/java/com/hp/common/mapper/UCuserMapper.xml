@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UCuserMapper">
+    <resultMap id="BaseResultMap" type="com.hp.common.model.UCuser">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="sname" jdbcType="VARCHAR" property="sname"/>
+        <result column="dname" jdbcType="VARCHAR" property="dname"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="flg" jdbcType="BIGINT" property="flg"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+   id, sname, dname, name, flg
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_cuser
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+
+    <select id="selectWCJ" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from u_cuser
+        <where>
+            and flg = 0
+        </where>
+    </select>
+
+    <select id="selectHJ" resultMap="BaseResultMap" parameterType="java.lang.Long">
+        select
+        <include refid="Base_Column_List"/>
+        from u_cuser
+        <where>
+            and flg = #{flg,jdbcType=BIGINT}
+        </where>
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_cuser
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+    <insert id="insert" parameterType="com.hp.common.model.UCuser">
+        insert into u_cuser (id, sname, dname,
+        name, flg)
+        values (#{id,jdbcType=BIGINT}, #{sname,jdbcType=VARCHAR}, #{dname,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR}, #{flg,jdbcType=BIGINT})
+    </insert>
+    <insert id="insertSelective" parameterType="com.hp.common.model.UCuser">
+        insert into u_cuser
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="sname != null">
+                sname,
+            </if>
+            <if test="dname != null">
+                dname,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="flg != null">
+                flg,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="sname != null">
+                #{sname,jdbcType=VARCHAR},
+            </if>
+            <if test="dname != null">
+                #{dname,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="flg != null">
+                #{flg,jdbcType=BIGINT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UCuser">
+        update u_cuser
+        <set>
+            <if test="sname != null">
+                sname = #{sname,jdbcType=VARCHAR},
+            </if>
+            <if test="dname != null">
+                dname = #{dname,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="flg != null">
+                flg = #{flg,jdbcType=BIGINT},
+            </if>
+        </set>
+        where id = #{id,jdbcType=BIGINT}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UCuser">
+    update u_cuser
+    set sname = #{sname,jdbcType=VARCHAR},
+      dname = #{dname,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      flg = #{flg,jdbcType=BIGINT}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

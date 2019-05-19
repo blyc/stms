@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hp.common.dao.UStudenteFinalMapper">
+  <resultMap id="BaseResultMap" type="com.hp.common.model.UStudenteFinal">
+    <id column="ufid" jdbcType="BIGINT" property="ufid" />
+    <result column="sid" jdbcType="BIGINT" property="sid" />
+    <result column="sname" jdbcType="VARCHAR" property="sname" />
+    <result column="ccid" jdbcType="BIGINT" property="ccid" />
+    <result column="ccname" jdbcType="VARCHAR" property="ccname" />
+    <result column="cid" jdbcType="BIGINT" property="cid" />
+    <result column="cname" jdbcType="VARCHAR" property="cname" />
+    <result column="stage" jdbcType="VARCHAR" property="stage" />
+    <result column="protocol" jdbcType="VARCHAR" property="protocol" />
+    <result column="create_id" jdbcType="BIGINT" property="createId" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ufid, sid, sname, ccid, ccname, cid, cname, stage, protocol, create_id, createtime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from u_studente_final
+    where ufid = #{ufid,jdbcType=BIGINT}
+  </select>
+  <select id="selectBySid" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from u_studente_final
+    where sid = #{sid,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from u_studente_final
+    where ufid = #{ufid,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.hp.common.model.UStudenteFinal">
+    insert into u_studente_final (ufid, sid, sname, 
+      ccid, ccname, cid, cname, 
+      stage, protocol, create_id, 
+      createtime)
+    values (#{ufid,jdbcType=BIGINT}, #{sid,jdbcType=BIGINT}, #{sname,jdbcType=VARCHAR}, 
+      #{ccid,jdbcType=BIGINT}, #{ccname,jdbcType=VARCHAR}, #{cid,jdbcType=BIGINT}, #{cname,jdbcType=VARCHAR}, 
+      #{stage,jdbcType=VARCHAR}, #{protocol,jdbcType=VARCHAR}, #{createId,jdbcType=BIGINT}, 
+      #{createtime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hp.common.model.UStudenteFinal">
+    insert into u_studente_final
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="ufid != null">
+        ufid,
+      </if>
+      <if test="sid != null">
+        sid,
+      </if>
+      <if test="sname != null">
+        sname,
+      </if>
+      <if test="ccid != null">
+        ccid,
+      </if>
+      <if test="ccname != null">
+        ccname,
+      </if>
+      <if test="cid != null">
+        cid,
+      </if>
+      <if test="cname != null">
+        cname,
+      </if>
+      <if test="stage != null">
+        stage,
+      </if>
+      <if test="protocol != null">
+        protocol,
+      </if>
+      <if test="createId != null">
+        create_id,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="ufid != null">
+        #{ufid,jdbcType=BIGINT},
+      </if>
+      <if test="sid != null">
+        #{sid,jdbcType=BIGINT},
+      </if>
+      <if test="sname != null">
+        #{sname,jdbcType=VARCHAR},
+      </if>
+      <if test="ccid != null">
+        #{ccid,jdbcType=BIGINT},
+      </if>
+      <if test="ccname != null">
+        #{ccname,jdbcType=VARCHAR},
+      </if>
+      <if test="cid != null">
+        #{cid,jdbcType=BIGINT},
+      </if>
+      <if test="cname != null">
+        #{cname,jdbcType=VARCHAR},
+      </if>
+      <if test="stage != null">
+        #{stage,jdbcType=VARCHAR},
+      </if>
+      <if test="protocol != null">
+        #{protocol,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null">
+        #{createId,jdbcType=BIGINT},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hp.common.model.UStudenteFinal">
+    update u_studente_final
+    <set>
+      <if test="sid != null">
+        sid = #{sid,jdbcType=BIGINT},
+      </if>
+      <if test="sname != null">
+        sname = #{sname,jdbcType=VARCHAR},
+      </if>
+      <if test="ccid != null">
+        ccid = #{ccid,jdbcType=BIGINT},
+      </if>
+      <if test="ccname != null">
+        ccname = #{ccname,jdbcType=VARCHAR},
+      </if>
+      <if test="cid != null">
+        cid = #{cid,jdbcType=BIGINT},
+      </if>
+      <if test="cname != null">
+        cname = #{cname,jdbcType=VARCHAR},
+      </if>
+      <if test="stage != null">
+        stage = #{stage,jdbcType=VARCHAR},
+      </if>
+      <if test="protocol != null">
+        protocol = #{protocol,jdbcType=VARCHAR},
+      </if>
+      <if test="createId != null">
+        create_id = #{createId,jdbcType=BIGINT},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ufid = #{ufid,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hp.common.model.UStudenteFinal">
+    update u_studente_final
+    set sid = #{sid,jdbcType=BIGINT},
+      sname = #{sname,jdbcType=VARCHAR},
+      ccid = #{ccid,jdbcType=BIGINT},
+      ccname = #{ccname,jdbcType=VARCHAR},
+      cid = #{cid,jdbcType=BIGINT},
+      cname = #{cname,jdbcType=VARCHAR},
+      stage = #{stage,jdbcType=VARCHAR},
+      protocol = #{protocol,jdbcType=VARCHAR},
+      create_id = #{createId,jdbcType=BIGINT},
+      createtime = #{createtime,jdbcType=TIMESTAMP}
+    where ufid = #{ufid,jdbcType=BIGINT}
+  </update>
+</mapper>
